@@ -26,7 +26,7 @@ setup(
     license="Apache 2.0",
     install_requires=[
         "overrides>=1.8",
-        "boto3==1.9.22"
+        "boto3==1.9.228"
     ],
     dependency_links=[
     ],
