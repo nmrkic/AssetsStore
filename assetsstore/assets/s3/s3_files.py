@@ -54,11 +54,10 @@ class ProgressPercentage(object):
 class S3Files(FileAssets):
 
     def __init__(self):
-        self.aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID", None)
-        self.aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY", None)
-        self.s3_bucket_name = os.getenv("S3_BUCKET_NAME")
-        self.region_name = os.getenv("S3_REGION_NAME")
-
+        self.aws_access_key_id = os.getenv("ASSET_ACCESS_KEY", None)
+        self.aws_secret_access_key = os.getenv("ASSET_SECRET_ACCESS_KEY", None)
+        self.s3_bucket_name = os.getenv("ASSET_LOCATION")
+        self.region_name = os.getenv("ASSET_REGION")
         session = None
         if self.aws_access_key_id:
             session = boto3.Session(
@@ -68,10 +67,11 @@ class S3Files(FileAssets):
         else:
             session = boto3.Session()
         self.connection = session.client('s3')
+        super().__init__()
 
     def get_file(self, filename):
         try:
-            full_filename = os.path.realpath("{}{}".format(os.getenv("LOCAL_STORE", ""), filename))
+            full_filename = os.path.realpath("{}{}".format(self.local_store, filename))
             my_file = Path(full_filename)
             if not my_file.is_file():
                 logger.info("server file path {}".format(full_filename))
@@ -88,7 +88,7 @@ class S3Files(FileAssets):
 
     def put_file(self, filename):
         try:
-            full_filename = os.path.realpath("{}{}".format(os.getenv("LOCAL_STORE", ""), filename))
+            full_filename = os.path.realpath("{}{}".format(self.local_store, filename))
             logger.info("server file path {}".format(full_filename))
             progress = ProgressPercentage(full_filename)
             self.connection.upload_file(full_filename, self.s3_bucket_name, filename, Callback=progress)

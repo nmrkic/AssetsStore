@@ -7,7 +7,7 @@ import os
 logger = logging.getLogger(__name__)
 
 
-class ServerFiles(FileAssets):
+class LocalFiles(FileAssets):
 
     def __init__(self):
         self.location = os.getenv("ASSET_LOCATION", "")
@@ -17,7 +17,8 @@ class ServerFiles(FileAssets):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
         try:
-            if not local_filename.is_file():
+            local_file = Path(local_filename)
+            if not local_file.is_file():
                 print(copyfile(asset_filename, local_filename))
             else:
                 logger.info("File already downloaded {}".format(local_filename))
@@ -42,6 +43,6 @@ class ServerFiles(FileAssets):
         if os.path.exists(asset_filename):
             try:
                 os.remove(asset_filename)
-                return "Removed"
+                return "Deleted"
             except Exception as e:
                 logger.exception("Delete file from local store failed with error: {}".format(str(e)))

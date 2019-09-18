@@ -2,13 +2,15 @@ import abc
 import os
 import uuid
 import zipfile
+import logging
 
+logger = logging.getLogger(__name__)
 
 class FileAssets(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self):
-        pass
+        self.local_store = os.getenv("LOCAL_STORE", "")
 
     @abc.abstractmethod
     def get_file(self, filename):
@@ -22,7 +24,7 @@ class FileAssets(object):
         match_path, ext = os.path.splitext(filename)
         randomise_name = '{}-{}{}'.format(match_path, uuid.uuid4().hex, ext)
         saved_filename = '{}'.format(randomise_name)
-        full_filename = os.path.realpath("{}{}".format(os.getenv("LOCAL_STORE", ""), saved_filename))
+        full_filename = os.path.realpath("{}{}".format(self.local_store, saved_filename))
         with open(full_filename, 'wb') as model_file:
             model_file.write(file.read())
 
@@ -36,11 +38,29 @@ class FileAssets(object):
 
     @classmethod
     def get_asset(cls):
+        asset = None
+        selected = os.getenv("ASSET_STORE", "")
         for sub_cls in cls.__subclasses__():
-            if os.getenv("ASSET_STORE", "ServerFiles").lower() == sub_cls.__name__.lower():
-                return sub_cls()
-
+            if selected.lower() == sub_cls.__name__.lower():
+                asset = sub_cls
+        if not asset:
+            raise Exception("""There is no asset by name '{}' please set environment variable ASSET_STORE to one of the following:
+                LocalFiles, ServerFiles, S3Files""".format(selected))
+        return asset()
     def compress(self, file):
         with zipfile.ZipFile(file.replace('.csv', '.zip'), 'w', zipfile.ZIP_DEFLATED) as zipped:
             zipped.write(file, file.split('/')[-1])
         return file.replace('.csv', '.zip')
+
+    def del_local_file(self, filename):
+        local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
+        if os.path.exists(local_filename):
+            try:
+                os.remove(local_filename)
+                return "Deleted"
+            except Exception as e:
+                logger.exception("Delete local file failed with error: {}".format(str(e)))
+        else:
+            logger.info("Local file does not exist {}".format(local_filename))
+        return "Not Deleted"
+ 
