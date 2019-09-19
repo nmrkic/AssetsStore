@@ -18,7 +18,7 @@ class AsssetsS3Test(TestCase):
         print(context.exception)
         self.assertTrue("There is no asset" in str(context.exception))
 
-    def test_upload_and_download_from_s3(self):
+    def test_upload_and_download_from_local(self):
         # get set store
         os.environ["ASSET_STORE"]="LocalFiles"
 
