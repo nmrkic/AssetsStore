@@ -1,6 +1,6 @@
 from assetsstore.assets import FileAssets
 from shutil import copyfile
-from pathlib
+import pathlib
 import logging
 import os
 
