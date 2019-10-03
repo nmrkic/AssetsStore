@@ -32,7 +32,7 @@ class LocalFiles(FileAssets):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
         try:
-            folder_path = pathlib.Path("/".join(local_filename.split("/")[:-1]))
+            folder_path = pathlib.Path("/".join(asset_filename.split("/")[:-1]))
             print(folder_path)
             folder_path.mkdir(parents=True, exist_ok=True)
             print(copyfile(local_filename, asset_filename))
