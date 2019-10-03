@@ -37,7 +37,7 @@ class LocalFiles(FileAssets):
             folder_path.mkdir(parents=True, exist_ok=True)
             print(copyfile(local_filename, asset_filename))
         except Exception as e:
-            logger.exception("Download file from local store failed with error: {}".format(str(e)))
+            logger.exception("Upload file to store failed with error: {}".format(str(e)))
             return "Failed"
         return "Uploaded"
 
