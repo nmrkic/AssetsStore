@@ -19,7 +19,10 @@ class LocalFiles(FileAssets):
         try:
             local_file = pathlib.Path(local_filename)
             if not local_file.is_file():
-                print(copyfile(asset_filename, local_filename))
+                folder_path = pathlib.Path("/".join(local_filename.split("/")[:-1]))
+                logger.info(folder_path)
+                folder_path.mkdir(parents=True, exist_ok=True)
+                logger.info(copyfile(asset_filename, local_filename))
             else:
                 logger.info("File already downloaded {}".format(local_filename))
                 return "Exists"
@@ -33,9 +36,7 @@ class LocalFiles(FileAssets):
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
         try:
             folder_path = pathlib.Path("/".join(asset_filename.split("/")[:-1]))
-            print(folder_path)
             folder_path.mkdir(parents=True, exist_ok=True)
-            print(copyfile(local_filename, asset_filename))
         except Exception as e:
             logger.exception("Upload file to store failed with error: {}".format(str(e)))
             return "Failed"
