@@ -16,6 +16,7 @@ class LocalFiles(FileAssets):
     def get_file(self, filename):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
+        logger.info("asset {}, local {}".format(asset_filename, local_filename))
         try:
             local_file = pathlib.Path(local_filename)
             if not local_file.is_file():
