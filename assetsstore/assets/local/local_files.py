@@ -35,6 +35,7 @@ class LocalFiles(FileAssets):
     def put_file(self, filename):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
+        logger.info("asset {}, local {}".format(asset_filename, local_filename))
         try:
             folder_path = pathlib.Path("/".join(asset_filename.split("/")[:-1]))
             folder_path.mkdir(parents=True, exist_ok=True)
