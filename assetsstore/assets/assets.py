@@ -20,7 +20,7 @@ class FileAssets(object):
         raise "Not implemented abstract method"
 
     def put_folder(self, path):
-        for root, dirs, files in os.walk("{}{}".format(self.local_store, path):
+        for root, dirs, files in os.walk("{}{}".format(self.local_store, path)):
             for f in files:
                 logger.info("files {}, {}, {}".format(root, dirs, f))
                 self.put_file("{}/{}".format(path, f))
