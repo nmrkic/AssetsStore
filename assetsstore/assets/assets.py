@@ -22,8 +22,8 @@ class FileAssets(object):
     def put_folder(self, path):
         for root, dirs, files in os.walk(path):
             for f in files:
-            logger.info("files {}, {}, {}".format(root, dirs, f))
-            self.put_file("{}/{}".format(path, f))
+                logger.info("files {}, {}, {}".format(root, dirs, f))
+                self.put_file("{}/{}".format(path, f))
 
     @abc.abstractmethod
     def put_file(self, filename):
