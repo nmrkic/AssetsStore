@@ -39,6 +39,7 @@ class LocalFiles(FileAssets):
         try:
             folder_path = pathlib.Path("/".join(asset_filename.split("/")[:-1]))
             folder_path.mkdir(parents=True, exist_ok=True)
+            copyfile(local_filename, asset_filename)
         except Exception as e:
             logger.exception("Upload file to store failed with error: {}".format(str(e)))
             return "Failed"
