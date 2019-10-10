@@ -13,8 +13,16 @@ class FileAssets(object):
         self.local_store = os.getenv("LOCAL_STORE", "")
 
     @abc.abstractmethod
+    def get_folder(self, path):
+        raise "Not implemented abstract method"
+    @abc.abstractmethod
     def get_file(self, filename):
         raise "Not implemented abstract method"
+
+    def put_folder(self, path):
+        for root, dirs, files in os.walk(path):
+            logger.info(root, dirs, fiels)
+            self.put_file("{}/{}".format(path, files ))
 
     @abc.abstractmethod
     def put_file(self, filename):

@@ -69,6 +69,16 @@ class S3Files(FileAssets):
         self.connection = session.client('s3')
         super().__init__()
 
+    def get_folder(self, path):
+        # def downloadDirectoryFroms3(bucketName,remoteDirectoryName):
+        # s3_resource = boto3.resource('s3')
+        # bucket = s3_resource.Bucket(bucketName) 
+        # for object in bucket.objects.filter(Prefix = remoteDirectoryName):
+        #     if not os.path.exists(os.path.dirname(object.key)):
+        #         os.makedirs(os.path.dirname(object.key))
+        #     bucket.download_file(object.key,object.key)
+        pass
+
     def get_file(self, filename):
         try:
             full_filename = os.path.realpath("{}{}".format(self.local_store, filename))

@@ -13,17 +13,25 @@ class LocalFiles(FileAssets):
         self.location = os.getenv("ASSET_LOCATION", "")
         super().__init__()
 
+    def get_folder(self, path):
+        # def downloadDirectoryFroms3(bucketName,remoteDirectoryName):
+        # s3_resource = boto3.resource('s3')
+        # bucket = s3_resource.Bucket(bucketName) 
+        # for object in bucket.objects.filter(Prefix = remoteDirectoryName):
+        #     if not os.path.exists(os.path.dirname(object.key)):
+        #         os.makedirs(os.path.dirname(object.key))
+        #     bucket.download_file(object.key,object.key)
+        pass
+
     def get_file(self, filename):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
-        logger.info("asset {}, local {}".format(asset_filename, local_filename))
         try:
             local_file = pathlib.Path(local_filename)
             if not local_file.is_file():
                 folder_path = pathlib.Path("/".join(local_filename.split("/")[:-1]))
-                logger.info(folder_path)
                 folder_path.mkdir(parents=True, exist_ok=True)
-                logger.info(copyfile(asset_filename, local_filename))
+                copyfile(asset_filename, local_filename)
             else:
                 logger.info("File already downloaded {}".format(local_filename))
                 return "Exists"
@@ -35,7 +43,6 @@ class LocalFiles(FileAssets):
     def put_file(self, filename):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
-        logger.info("asset {}, local {}".format(asset_filename, local_filename))
         try:
             folder_path = pathlib.Path("/".join(asset_filename.split("/")[:-1]))
             folder_path.mkdir(parents=True, exist_ok=True)
