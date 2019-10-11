@@ -56,6 +56,7 @@ class FileAssets(object):
             raise Exception("""There is no asset by name '{}' please set environment variable ASSET_STORE to one of the following:
                 LocalFiles, ServerFiles, S3Files""".format(selected))
         return asset()
+    
     def compress(self, file):
         with zipfile.ZipFile(file.replace('.csv', '.zip'), 'w', zipfile.ZIP_DEFLATED) as zipped:
             zipped.write(file, file.split('/')[-1])
