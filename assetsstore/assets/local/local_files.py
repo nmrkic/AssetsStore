@@ -19,7 +19,7 @@ class LocalFiles(FileAssets):
             logger.info("data in path and location {} {}".format(files, dirs))
             for f in files:
                 logger.info("files {}, {}, {}".format(root, dirs, f))
-                self.get_file("{}/{}".format(path, f))
+                self.get_file("{}/{}".format(root.replace(self.location, ""), f))
 
     def get_file(self, filename):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
