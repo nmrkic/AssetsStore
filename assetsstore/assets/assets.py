@@ -15,6 +15,7 @@ class FileAssets(object):
     @abc.abstractmethod
     def get_folder(self, path):
         raise "Not implemented abstract method"
+
     @abc.abstractmethod
     def get_file(self, filename):
         raise "Not implemented abstract method"
