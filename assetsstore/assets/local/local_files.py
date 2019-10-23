@@ -14,11 +14,8 @@ class LocalFiles(FileAssets):
         super().__init__()
 
     def get_folder(self, path):
-        logger.info("path {}".format(path))
         for root, dirs, files in os.walk("{}{}".format(self.location, path)):
-            logger.info("data in path and location {} {}".format(files, dirs))
             for f in files:
-                logger.info("files {}, {}, {}".format(root, dirs, f))
                 self.get_file("{}/{}".format(root.replace(self.location, ""), f))
 
     def get_file(self, filename):

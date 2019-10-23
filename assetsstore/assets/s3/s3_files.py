@@ -84,7 +84,6 @@ class S3Files(FileAssets):
             full_filename = os.path.realpath("{}{}".format(self.local_store, filename))
             my_file = Path(full_filename)
             if not my_file.is_file():
-                logger.info("server file path {}".format(full_filename))
                 progress = ProgressPercentage(filename, self.connection, self.s3_bucket_name)
                 self.connection.download_file(self.s3_bucket_name, filename, full_filename, Callback=progress)
             else:
@@ -99,7 +98,6 @@ class S3Files(FileAssets):
     def put_file(self, filename):
         try:
             full_filename = os.path.realpath("{}{}".format(self.local_store, filename))
-            logger.info("server file path {}".format(full_filename))
             progress = ProgressPercentage(full_filename)
             self.connection.upload_file(full_filename, self.s3_bucket_name, filename, Callback=progress)
             return "Uploaded"
