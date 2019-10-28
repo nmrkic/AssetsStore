@@ -11,7 +11,7 @@ class LocalFiles(FileAssets):
 
     def __init__(self):
         self.location = os.getenv("ASSET_LOCATION", "")
-        self.server_url = os.getenv("ASSET_PUBLIC_URL", "")
+        self.server_url = os.getenv("ASSET_PUBLIC_URL", "error")
         super().__init__()
 
     def get_access(self, filename, seconds):
