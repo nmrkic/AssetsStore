@@ -15,6 +15,7 @@ class ServerFiles(FileAssets):
         self.username = os.getenv("ASSET_ACCESS_KEY")
         self.password = os.getenv("ASSET_SECRET_ACCESS_KEY")
         self.location = os.getenv("ASSET_LOCATION", "")
+        self.server_url = os.getenv("ASSET_PUBLIC_URL", "")
         self.ssh = paramiko.SSHClient()
         self.ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
         self.ssh.connect(self.server, username=self.username, password=self.password)
