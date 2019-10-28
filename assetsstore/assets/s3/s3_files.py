@@ -72,7 +72,6 @@ class S3Files(FileAssets):
     def get_access(self, filename, seconds):
         response = None
         try:
-            self.connection.
             response = self.connection.generate_presigned_url(
                 ClientMethod='get_object',
                 Params={
