@@ -11,13 +11,18 @@ class LocalFiles(FileAssets):
 
     def __init__(self):
         self.location = os.getenv("ASSET_LOCATION", "")
+        self.server_url = os.getenv("PUBLIC_URL", "")
         super().__init__()
+
+    def get_access(self, filename, seconds):
+        return "{}{}".format(self.server_url, filename)
+
 
     def get_folder(self, path):
         for root, dirs, files in os.walk("{}{}".format(self.location, path)):
             for f in files:
                 self.get_file("{}/{}".format(root.replace(self.location, ""), f))
-
+        return "Donwloaded"
     def get_file(self, filename):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))

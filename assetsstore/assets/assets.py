@@ -20,6 +20,9 @@ class FileAssets(object):
     def get_file(self, filename):
         raise "Not implemented abstract method"
 
+    def get_access(self, filename, seconds):
+        reaise "Not implemented abstract method"
+
     def put_folder(self, path):
         for root, dirs, files in os.walk("{}{}".format(self.local_store, path)):
             for f in files:

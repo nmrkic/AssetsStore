@@ -20,13 +20,40 @@ class ServerFiles(FileAssets):
         self.ssh.connect(self.server, username=self.username, password=self.password)
         super().__init__()
 
+    def get_access(self, filename, seconds):
+        return "{}{}".format(self.server_url, filename)
+
+    def listdir_r(self, sftp, remotedir):
+        file_list = []
+        for entry in sftp.listdir_attr(remotedir):
+            remotepath = remotedir + "/" + entry.filename
+            mode = entry.st_mode
+            if S_ISDIR(mode):
+                file_list.extend(listdir_r(sftp, remotepath))
+            elif S_ISREG(mode):
+                file_list.append(remotepath)
+        return file_list
+
+    def get_folder(self, path):
+        try:
+            sftp = self.ssh.open_sftp()
+            for r_file in self.listdir_r(sftp, path):
+                folder_path = pathlib.Path("/".join(local_filename.split("/")[:-1]))
+                folder_path.mkdir(parents=True, exist_ok=True)
+                self.get_file(r_file)
+
+            sftp.close()
+        except Exception as e:
+            logger.exception("Failed to read remote folder. Exception {}".format(str(e)))
+        return 'Downloaded'
     def get_file(self, filename):
+
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
         try:
             local_file = Path(local_filename)
             if not local_file.is_file():
-                sftp = ssh.open_sftp()
+                sftp = self.ssh.open_sftp()
                 sftp.get(asset_filename, local_filename)
                 sftp.close()
             else:
@@ -43,7 +70,7 @@ class ServerFiles(FileAssets):
         try:
             local_file = Path(local_filename)
             if local_file.is_file():
-                sftp = ssh.open_sftp()
+                sftp = self.ssh.open_sftp()
                 sftp.put(local_filename, asset_filename)
                 sftp.close()
             else:
@@ -58,7 +85,7 @@ class ServerFiles(FileAssets):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         if os.path.exists(asset_filename):
             try:
-                sftp = ssh.open_sftp()
+                sftp = self.ssh.open_sftp()
                 sftp.remove(asset_filename)
                 sftp.close()
                 return "Removed"

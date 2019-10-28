@@ -69,6 +69,20 @@ class S3Files(FileAssets):
         self.connection = session.client('s3')
         super().__init__()
 
+    def get_access(self, filename, seconds):
+        response = None
+        try:
+            response = self.connection.generate_presigned_url(
+                '',
+                Params={
+                    'Bucket': self.s3_bucket_name,
+                    'Key': filename,
+                },
+                ExpiresIn=seconds
+            )
+        except Exception as e:
+            logger.exception("Not able to give access to {} for {} seconds. Exception".format(filename, seconds, str(e)))
+        return response 
     def get_folder(self, path):
         # def downloadDirectoryFroms3(bucketName,remoteDirectoryName):
         # s3_resource = boto3.resource('s3')
