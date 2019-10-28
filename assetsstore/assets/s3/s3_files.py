@@ -72,8 +72,9 @@ class S3Files(FileAssets):
     def get_access(self, filename, seconds):
         response = None
         try:
+            self.connection.
             response = self.connection.generate_presigned_url(
-                '',
+                ClientMethod='get_object',
                 Params={
                     'Bucket': self.s3_bucket_name,
                     'Key': filename,
@@ -84,13 +85,14 @@ class S3Files(FileAssets):
             logger.exception("Not able to give access to {} for {} seconds. Exception".format(filename, seconds, str(e)))
         return response 
     def get_folder(self, path):
-        # def downloadDirectoryFroms3(bucketName,remoteDirectoryName):
+        local_folder = os.path.realpath("{}{}".format(self.local_store, path))
         # s3_resource = boto3.resource('s3')
         # bucket = s3_resource.Bucket(bucketName) 
         # for object in bucket.objects.filter(Prefix = remoteDirectoryName):
         #     if not os.path.exists(os.path.dirname(object.key)):
         #         os.makedirs(os.path.dirname(object.key))
-        #     bucket.download_file(object.key,object.key)
+        #     full_filename = os.path.realpath("{}{}".format(self.local_store, object.key))
+        #     self.connection.download_file(self.s3_bucket_name, object.key,full_filename)
         pass
 
     def get_file(self, filename):
