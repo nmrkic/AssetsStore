@@ -73,6 +73,8 @@ class S3Files(FileAssets):
     def get_access(self, filename, seconds):
         response = None
         try:
+            if not seconds:
+                secodns = 3600 * 24 * 30 * 12
             response = self.connection.generate_presigned_url(
                 ClientMethod='get_object',
                 Params={
