@@ -70,11 +70,11 @@ class S3Files(FileAssets):
         self.resource = session.resource('s3')
         super().__init__()
 
-    def get_access(self, filename, seconds):
+    def get_access(self, filename, seconds=0):
         response = None
         try:
-            if not seconds:
-                secodns = 3600 * 24 * 30 * 12
+            if not seconds or seconds = 0:
+                seconds = 3600 * 24 * 14 # around a year
             response = self.connection.generate_presigned_url(
                 ClientMethod='get_object',
                 Params={
