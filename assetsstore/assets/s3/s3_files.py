@@ -84,15 +84,20 @@ class S3Files(FileAssets):
             logger.exception("Not able to give access to {} for {} seconds. Exception".format(filename, seconds, str(e)))
         return response 
     def get_folder(self, path):
-        local_folder = os.path.realpath("{}{}".format(self.local_store, path))
-        # s3_resource = boto3.resource('s3')
-        # bucket = s3_resource.Bucket(bucketName) 
-        # for object in bucket.objects.filter(Prefix = remoteDirectoryName):
-        #     if not os.path.exists(os.path.dirname(object.key)):
-        #         os.makedirs(os.path.dirname(object.key))
-        #     full_filename = os.path.realpath("{}{}".format(self.local_store, object.key))
-        #     self.connection.download_file(self.s3_bucket_name, object.key,full_filename)
-        pass
+        try:
+            local_folder = os.path.realpath("{}{}".format(self.local_store, path))
+            logger.info("Getting folder from s3 {}, into local folder {}".format(path, local_folder))
+            s3_resource = boto3.resource('s3')
+            bucket = s3_resource.Bucket(bucketName) 
+            for object in bucket.objects.filter(Prefix=path):
+                if not os.path.exists(os.path.dirname(object.key)):
+                    os.makedirs(os.path.dirname(object.key))
+                full_filename = os.path.realpath("{}{}".format(self.local_store, object.key))
+                self.connection.download_file(self.s3_bucket_name, object.key,full_filename)
+        except Exception as e:
+            logger.info("Error occured while downloading folder from s3 {}".format(str(e)))
+            return "Failed"
+        return "Downloaded"
 
     def get_file(self, filename):
         try:
