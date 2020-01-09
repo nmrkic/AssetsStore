@@ -92,10 +92,10 @@ class S3Files(FileAssets):
             for obj in bucket.objects.filter(Prefix=path):
                 try:
                     logger.info("Downloading file {}".format(obj.key))
-                    if not os.path.exists(os.path.dirname(obj.key)):
-                        os.makedirs(os.path.dirname(obj.key))
                     full_filename = os.path.realpath("{}{}".format(self.local_store, obj.key))
-                    self.connection.download_file(self.s3_bucket_name, obj.key,full_filename)
+                    if not os.path.exists(os.path.dirname(full_filename)):
+                        os.makedirs(os.path.dirname(full_filename))
+                    self.connection.download_file(self.s3_bucket_name, obj.key, full_filename)
                 except Exception as e:
                     logger.warn("Error occured downloading file {}, with error: {}".format(str(e), obj.key))
         except Exception as e:
