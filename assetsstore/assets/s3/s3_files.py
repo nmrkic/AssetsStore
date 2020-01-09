@@ -95,7 +95,7 @@ class S3Files(FileAssets):
                     full_filename = os.path.realpath("{}{}".format(self.local_store, obj.key))
                     if not os.path.exists(os.path.dirname(full_filename)):
                         os.makedirs(os.path.dirname(full_filename))
-                    self.connection.download_file(self.s3_bucket_name, obj.key, full_filename)
+                    self.get_file(obj.key)
                 except Exception as e:
                     logger.warn("Error occured downloading file {}, with error: {}".format(str(e), obj.key))
         except Exception as e:
