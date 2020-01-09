@@ -73,8 +73,8 @@ class S3Files(FileAssets):
     def get_access(self, filename, seconds=0):
         response = None
         try:
-            if not seconds or seconds = 0:
-                seconds = 3600 * 24 * 14 # around a year
+            if not seconds or seconds == 0:
+                seconds = 3600 * 24 * 14 # two weeks max
             response = self.connection.generate_presigned_url(
                 ClientMethod='get_object',
                 Params={
@@ -86,6 +86,7 @@ class S3Files(FileAssets):
         except Exception as e:
             logger.exception("Not able to give access to {} for {} seconds. Exception".format(filename, seconds, str(e)))
         return response 
+
     def get_folder(self, path):
         try:
             local_folder = os.path.realpath("{}{}".format(self.local_store, path))
