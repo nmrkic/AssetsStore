@@ -89,11 +89,12 @@ class S3Files(FileAssets):
             local_folder = os.path.realpath("{}{}".format(self.local_store, path))
             logger.info("Getting folder from s3 {}, into local folder {}".format(path, local_folder))
             bucket = self.resource.Bucket(self.s3_bucket_name) 
-            for object in bucket.objects.filter(Prefix=path):
-                if not os.path.exists(os.path.dirname(object.key)):
-                    os.makedirs(os.path.dirname(object.key))
-                full_filename = os.path.realpath("{}{}".format(self.local_store, object.key))
-                self.connection.download_file(self.s3_bucket_name, object.key,full_filename)
+            for obj in bucket.objects.filter(Prefix=path):
+                logger.info("Downloading file {}".format(obj.key))
+                if not os.path.exists(os.path.dirname(obj.key)):
+                    os.makedirs(os.path.dirname(obj.key))
+                full_filename = os.path.realpath("{}{}".format(self.local_store, obj.key))
+                self.connection.download_file(self.s3_bucket_name, obj.key,full_filename)
         except Exception as e:
             logger.info("Error occured while downloading folder from s3 {}".format(str(e)))
             return "Failed"
