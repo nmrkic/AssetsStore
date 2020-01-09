@@ -67,6 +67,7 @@ class S3Files(FileAssets):
         else:
             session = boto3.Session()
         self.connection = session.client('s3')
+        self.resource = session.resource('s3')
         super().__init__()
 
     def get_access(self, filename, seconds):
@@ -87,8 +88,7 @@ class S3Files(FileAssets):
         try:
             local_folder = os.path.realpath("{}{}".format(self.local_store, path))
             logger.info("Getting folder from s3 {}, into local folder {}".format(path, local_folder))
-            s3_resource = self.connection.resource('s3')
-            bucket = s3_resource.Bucket(self.s3_bucket_name) 
+            bucket = self.resource.Bucket(self.s3_bucket_name) 
             for object in bucket.objects.filter(Prefix=path):
                 if not os.path.exists(os.path.dirname(object.key)):
                     os.makedirs(os.path.dirname(object.key))
