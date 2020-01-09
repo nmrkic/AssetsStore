@@ -88,7 +88,7 @@ class S3Files(FileAssets):
             local_folder = os.path.realpath("{}{}".format(self.local_store, path))
             logger.info("Getting folder from s3 {}, into local folder {}".format(path, local_folder))
             s3_resource = boto3.resource('s3')
-            bucket = s3_resource.Bucket(bucketName) 
+            bucket = s3_resource.Bucket(self.s3_bucket_name) 
             for object in bucket.objects.filter(Prefix=path):
                 if not os.path.exists(os.path.dirname(object.key)):
                     os.makedirs(os.path.dirname(object.key))
