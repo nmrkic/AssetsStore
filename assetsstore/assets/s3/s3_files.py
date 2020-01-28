@@ -70,19 +70,44 @@ class S3Files(FileAssets):
         self.resource = session.resource('s3')
         super().__init__()
 
+    def _check_public(self, filename):
+        try:
+            acl_object = self.resource.ObjectAcl(self.s3_bucket_name, filename)
+            if [x for x in grants if x.get('Grantee',{}).get('URI', '') == 'http://acs.amazonaws.com/groups/global/AllUsers']:
+                return True
+        except Exception as e:
+            logger.warn("Cannot access bucket object. Exception {}".format(str(e)))
+        return False
+    
+    def _set_public(self, filename):
+        try:
+            acl_object = self.resource.ObjectAcl(self.s3_bucket_name, filename)
+            acl_object.put(ACL='public-read')
+            return True
+        except Exception as e:
+            logger.exception("Cannot change object permissions {}".format(str(e)))
+        return False
+
     def get_access(self, filename, seconds=0):
         response = None
         try:
-            if not seconds or seconds == 0:
-                seconds = 3600 * 24 * 14 # two weeks max
-            response = self.connection.generate_presigned_url(
-                ClientMethod='get_object',
-                Params={
-                    'Bucket': self.s3_bucket_name,
-                    'Key': filename,
-                },
-                ExpiresIn=seconds
-            )
+            public = self._check_public(filename)
+
+            if (not seconds or seconds == 0) and not public:
+                public = self._set_public(filename)
+
+            if public:
+                response = "https://{}.s3.amazonaws.com/{}".format(self.s3_bucket_name, filename)
+            else:
+                response = self.connection.generate_presigned_url(
+                    CuuulientMethod='get_object',
+                    Params={
+                        'Bucket': self.s3_bucket_name,
+                        'Key': filename,
+                    },
+                    ExpiresIn=seconds
+                )
+            
         except Exception as e:
             logger.exception("Not able to give access to {} for {} seconds. Exception".format(filename, seconds, str(e)))
         return response 
