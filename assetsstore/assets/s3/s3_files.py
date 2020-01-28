@@ -73,7 +73,7 @@ class S3Files(FileAssets):
     def _check_public(self, filename):
         try:
             acl_object = self.resource.ObjectAcl(self.s3_bucket_name, filename)
-            if [x for x in  alc_object if x.get('Grantee',{}).get('URI', '') == 'http://acs.amazonaws.com/groups/global/AllUsers']:
+            if [x for x in  acl_object if x.get('Grantee',{}).get('URI', '') == 'http://acs.amazonaws.com/groups/global/AllUsers']:
                 return True
         except Exception as e:
             logger.warn("Cannot access bucket object. Exception {}".format(str(e)))
@@ -100,7 +100,7 @@ class S3Files(FileAssets):
                 response = "https://{}.s3.amazonaws.com/{}".format(self.s3_bucket_name, filename)
             else:
                 response = self.connection.generate_presigned_url(
-                    CuuulientMethod='get_object',
+                    ClientMethod='get_object',
                     Params={
                         'Bucket': self.s3_bucket_name,
                         'Key': filename,
