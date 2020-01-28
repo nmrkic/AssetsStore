@@ -82,7 +82,8 @@ class S3Files(FileAssets):
     def _set_public(self, filename):
         try:
             acl_object = self.resource.ObjectAcl(self.s3_bucket_name, filename)
-            acl_object.put(ACL='public-read')
+            resp = acl_object.put(ACL='public-read')
+            logger.info("public read {}".format(resp))
             return True
         except Exception as e:
             logger.exception("Cannot change object permissions {}".format(str(e)))
