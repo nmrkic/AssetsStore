@@ -137,7 +137,7 @@ class S3Files(FileAssets):
             full_filename = os.path.realpath("{}{}".format(self.local_store, filename))
             my_file = Path(full_filename)
             if not my_file.is_file():
-                folder_path = pathlib.Path("/".join(full_filename.split("/")[:-1]))
+                folder_path = Path("/".join(full_filename.split("/")[:-1]))
                 folder_path.mkdir(parents=True, exist_ok=True)
                 progress = ProgressPercentage(filename, self.connection, self.s3_bucket_name)
                 self.connection.download_file(self.s3_bucket_name, filename, full_filename, Callback=progress)
