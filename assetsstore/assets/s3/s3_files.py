@@ -93,7 +93,7 @@ class S3Files(FileAssets):
         size = 0
         try:
             bucket = self.resource.Bucket(self.s3_bucket_name)
-            for key in bucket.objects.filter(Profix=folder):
+            for key in bucket.objects.filter(Prefix=folder):
                 size += key.size
 
         except Exception as e:
