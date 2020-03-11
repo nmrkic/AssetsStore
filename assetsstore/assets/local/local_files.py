@@ -23,6 +23,10 @@ class LocalFiles(FileAssets):
                 self.get_file("{}/{}".format(root.replace(self.location, ""), f))
         return "Donwloaded"
 
+    def get_size(self, folder):
+        size = 0
+        return size
+
     def get_file(self, filename):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))

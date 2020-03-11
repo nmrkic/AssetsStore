@@ -88,6 +88,17 @@ class S3Files(FileAssets):
         except Exception as e:
             logger.exception("Cannot change object permissions {}".format(str(e)))
         return False
+    
+    def get_size(self, folder):
+        size = 0
+        try:
+            bucket = self.resource.Bucket(self.s3_bucket_name)
+            for key in bucket.objects.filter(Profix=folder):
+                size += key.size
+
+        except Exception as e:
+            logger.exception("Cannot get size of the S3 bucket folder. Exception: {}".format(str(e)))
+        return size
 
     def get_access(self, filename, seconds=0):
         response = None
