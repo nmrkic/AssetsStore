@@ -171,9 +171,20 @@ class S3Files(FileAssets):
             logger.exception("Upload file to s3 failed with error: {}".format(str(e)))
             return "Failed"
 
-    def del_file(self, filename):
+    def del_file(self, filename, archive=False):
         try:
-            self.connection.delete_object(Bucket=self.s3_bucket_name, Key=filename)
+            if archive:
+                self.connection.copy(
+                    {"Bucket": self.s3_bucket_name, "Key": filename},
+                    self.s3_bucket_name,
+                    filename,
+                    ExtraArgs = {
+                        "StorageClass": "GLACIER",
+                        "MetadataDirective": "COPY"
+                    }
+                )
+            else:
+                self.connection.delete_object(Bucket=self.s3_bucket_name, Key=filename)
 
         except Exception as e:
             logger.exception("Delete file from s3 failed with error: {}".format(str(e)))

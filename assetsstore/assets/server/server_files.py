@@ -86,7 +86,7 @@ class ServerFiles(FileAssets):
             return "Failed"
         return "Uploaded"
 
-    def del_file(self, filename):
+    def del_file(self, filename, archive=False):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         if os.path.exists(asset_filename):
             try:
