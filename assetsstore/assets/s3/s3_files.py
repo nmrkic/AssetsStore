@@ -94,7 +94,8 @@ class S3Files(FileAssets):
         try:
             bucket = self.resource.Bucket(self.s3_bucket_name)
             for key in bucket.objects.filter(Prefix=folder):
-                size += key.size
+                if key.meta.data.get('StorageClass', "") == "STANDARD":
+                    size += key.size
 
         except Exception as e:
             logger.exception("Cannot get size of the S3 bucket folder. Exception: {}".format(str(e)))
