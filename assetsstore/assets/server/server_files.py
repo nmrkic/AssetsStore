@@ -24,6 +24,9 @@ class ServerFiles(FileAssets):
     def get_access(self, filename, seconds):
         return "{}{}".format(self.server_url, filename)
 
+    def get_upload_access(self, filename, seconds):
+        return "{}{}".format(self.server_url, filename)
+
     def get_size(self, folder):
         size = 0
         return size

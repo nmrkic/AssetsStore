@@ -17,6 +17,9 @@ class LocalFiles(FileAssets):
     def get_access(self, filename, seconds):
         return "{}{}".format(self.server_url, filename)
 
+    def get_upload_access(self, filename, seconds):
+        return "{}{}".format(self.server_url, filename)
+
     def get_folder(self, path):
         for root, dirs, files in os.walk("{}{}".format(self.location, path)):
             for f in files:
