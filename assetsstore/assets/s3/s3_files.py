@@ -70,10 +70,10 @@ class S3Files(FileAssets):
             session = boto3.Session()
         self.connection = session.client(
             's3', 
-            config=boto3.session.Config(
-                s3={'addressing_style': 'path'},
-                signature_version='s3v4'
-            )
+            # config=boto3.session.Config(
+            #     s3={'addressing_style': 'path'},
+            #     signature_version='s3v4'
+            # )
         )
         self.resource = session.resource('s3')
         super().__init__()
