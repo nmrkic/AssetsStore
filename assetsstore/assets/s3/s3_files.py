@@ -6,6 +6,8 @@ import logging
 from pathlib import Path
 import threading
 
+from boto3.s3.transfer import TransferConfig
+
 logger = logging.getLogger(__name__)
 
 
@@ -127,6 +129,10 @@ class S3Files(FileAssets):
     
     def get_upload_access(self, filename, seconds=0):
         response = None
+
+        # Set the desired multipart threshold value (5GB)
+        GB = 1024 
+        config = TransferConfig(multipart_threshold=GB)
         try:
             response = self.connection.generate_presigned_url(
                 ClientMethod='put_object',
@@ -134,7 +140,8 @@ class S3Files(FileAssets):
                     'Bucket': self.s3_bucket_name,
                     'Key': filename,
                 },
-                ExpiresIn=seconds
+                ExpiresIn=seconds,
+                Config=config
             )
             
         except Exception as e:
