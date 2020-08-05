@@ -68,13 +68,15 @@ class S3Files(FileAssets):
             )
         else:
             session = boto3.Session()
-        self.connection = session.client(
+        self.connection = session.client('s3')
+        self.upload_connection = session.client(
             's3', 
             config=boto3.session.Config(
                 s3={'addressing_style': 'path'},
                 signature_version='s3v4'
             )
         )
+
         self.resource = session.resource('s3')
         super().__init__()
 
@@ -138,7 +140,7 @@ class S3Files(FileAssets):
 
         # Set the desired multipart threshold value (5GB)
         try:
-            response = self.connection.generate_presigned_url(
+            response = self.upload_connection.generate_presigned_url(
                 ClientMethod='put_object',
                 Params={
                     'Bucket': self.s3_bucket_name,
