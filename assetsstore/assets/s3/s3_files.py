@@ -68,7 +68,11 @@ class S3Files(FileAssets):
             )
         else:
             session = boto3.Session()
-        self.connection = session.client('s3')
+        self.connection = session.client(
+            's3', 
+            config=Config(s3={'addressing_style': 'path'},
+            signature_version='s3v4'
+        )
         self.resource = session.resource('s3')
         super().__init__()
 
@@ -131,8 +135,6 @@ class S3Files(FileAssets):
         response = None
 
         # Set the desired multipart threshold value (5GB)
-        GB = 1024 
-        config = TransferConfig(multipart_threshold=GB)
         try:
             response = self.connection.generate_presigned_url(
                 ClientMethod='put_object',
@@ -140,8 +142,7 @@ class S3Files(FileAssets):
                     'Bucket': self.s3_bucket_name,
                     'Key': filename,
                 },
-                ExpiresIn=seconds,
-                Config=config
+                ExpiresIn=seconds
             )
             
         except Exception as e:
