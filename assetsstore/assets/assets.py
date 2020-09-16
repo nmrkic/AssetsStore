@@ -112,7 +112,7 @@ class FileAssets(object):
             if (r.status_code == requests.codes.ok):
                 link = r.json()
                 print("Long URL was %s, short URL is %s" % (link["destination"], link["shortUrl"]))
-                return link['shortUrl']
+                return "https://{}".format(link['shortUrl'])
             else:
                 logger.warn("Failed getting url, code {}. Response {}".format(r.status_code, r.content))
             return None
