@@ -94,7 +94,7 @@ class FileAssets(object):
         try:
             linkRequest = {
             "destination": url, 
-            , "domain": { "fullName": "rebrand.ly" }
+            "domain": { "fullName": "rebrand.ly" }
             # , "slashtag": "A_NEW_SLASHTAG"
             # , "title": "Rebrandly YouTube channel"
             }
