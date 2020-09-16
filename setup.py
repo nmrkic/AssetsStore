@@ -40,7 +40,7 @@ setup(
     install_requires=[
         "overrides>=1.8",
         "boto3==1.9.228",
-        "paramiko==2.6.0"
+        "paramiko==2.6.0",
         "requests==2.23.0"
     ],
     dependency_links=[
