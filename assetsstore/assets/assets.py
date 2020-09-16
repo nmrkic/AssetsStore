@@ -101,8 +101,8 @@ class FileAssets(object):
 
             requestHeaders = {
             "Content-type": "application/json",
-            "apikey": "YOUR_API_KEY",
-            "workspace": "YOUR_WORKSPACE_ID"
+            "apikey": os.getenv("REBRAND_KEY"),
+            # "workspace": "YOUR_WORKSPACE_ID"
             }
 
             r = requests.post("https://api.rebrandly.com/v1/links", 
