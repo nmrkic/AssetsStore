@@ -121,6 +121,9 @@ class S3Files(FileAssets):
 
             if public:
                 response = "https://{}.s3.amazonaws.com/{}".format(self.s3_bucket_name, filename)
+                short_url = self.shorten_url(response)
+                if short_url:
+                    response = shorten_url
             else:
                 response = self.connection.generate_presigned_url(
                     ClientMethod='get_object',

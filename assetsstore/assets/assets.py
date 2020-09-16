@@ -3,6 +3,8 @@ import os
 import uuid
 import zipfile
 import logging
+import requests
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -88,3 +90,32 @@ class FileAssets(object):
             logger.info("Local file does not exist {}".format(local_filename))
         return "Not Deleted"
  
+    def shorten_url(self, url):
+        try:
+            linkRequest = {
+            "destination": url, 
+            , "domain": { "fullName": "rebrand.ly" }
+            # , "slashtag": "A_NEW_SLASHTAG"
+            # , "title": "Rebrandly YouTube channel"
+            }
+
+            requestHeaders = {
+            "Content-type": "application/json",
+            "apikey": "YOUR_API_KEY",
+            "workspace": "YOUR_WORKSPACE_ID"
+            }
+
+            r = requests.post("https://api.rebrandly.com/v1/links", 
+                data = json.dumps(linkRequest),
+                headers=requestHeaders)
+
+            if (r.status_code == requests.codes.ok):
+                link = r.json()
+                print("Long URL was %s, short URL is %s" % (link["destination"], link["shortUrl"]))
+                return link['shortUrl']
+            else:
+                logger.warn("Failed getting url, code {}. Response {}".format(r.status_code, r.content))
+            return None
+        except Exception as e:
+            logger.warn("Issue getting shorter url. Error {}".fromat(str(e)))
+        return None
