@@ -128,13 +128,20 @@ class S3Files(FileAssets):
                 if short_url:
                     response = short_url
             else:
-                response = self.connection.generate_presigned_url(
-                    ClientMethod='get_object',
-                    Params={
-                        'Bucket': self.s3_bucket_name,
-                        'Key': filename,
-                    },
-                    ExpiresIn=seconds
+                # response = self.connection.generate_presigned_url(
+                #     ClientMethod='get_object',
+                #     Params={
+                #         'Bucket': self.s3_bucket_name,
+                #         'Key': filename,
+                #     },
+                #     ExpiresIn=seconds
+                # )
+                response = self.boto2_connection.generate_url(
+                    seconds,
+                    "GET",
+                    bucket=self.s3_bucket_name,
+                    key=filename,
+                    query_auth=True
                 )
 
         except Exception as e:
