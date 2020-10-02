@@ -4,7 +4,7 @@ A setuptools based setup module.
 
 from setuptools import setup, find_packages
 from os import path
-import assetsstore 
+import assetsstore
 import re
 
 # Get the long description from the README file
@@ -40,6 +40,7 @@ setup(
     install_requires=[
         "overrides>=1.8",
         "boto3==1.9.228",
+        "boto==2.49.0",
         "paramiko==2.6.0",
         "requests==2.23.0"
     ],

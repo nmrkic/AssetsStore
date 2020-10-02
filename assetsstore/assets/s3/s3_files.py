@@ -7,6 +7,7 @@ from pathlib import Path
 import threading
 
 from boto3.s3.transfer import TransferConfig
+from boto.s3.connection import S3Connection
 
 logger = logging.getLogger(__name__)
 
@@ -66,8 +67,10 @@ class S3Files(FileAssets):
                 aws_access_key_id=self.aws_access_key_id,
                 aws_secret_access_key=self.aws_secret_access_key,
             )
+            self.boto2_connection = S3Connection(self.aws_access_key_id, self.aws_secret_access_key)
         else:
             session = boto3.Session()
+            self.boto2_connection = S3Connection()
         self.connection = session.client('s3')
         self.upload_connection = session.client(
             's3',
