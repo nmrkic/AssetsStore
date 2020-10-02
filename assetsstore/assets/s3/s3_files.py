@@ -70,7 +70,7 @@ class S3Files(FileAssets):
             session = boto3.Session()
         self.connection = session.client('s3')
         self.upload_connection = session.client(
-            's3', 
+            's3',
             config=boto3.session.Config(
                 s3={'addressing_style': 'path'},
                 signature_version='s3v4'
@@ -88,7 +88,7 @@ class S3Files(FileAssets):
         except Exception as e:
             logger.warn("Cannot access bucket object. Exception {}".format(str(e)))
         return False
-    
+
     def _set_public(self, filename):
         try:
             acl_object = self.resource.ObjectAcl(self.s3_bucket_name, filename)
@@ -98,7 +98,7 @@ class S3Files(FileAssets):
         except Exception as e:
             logger.exception("Cannot change object permissions {}".format(str(e)))
         return False
-    
+
     def get_size(self, folder):
         size = 0
         try:
@@ -111,7 +111,7 @@ class S3Files(FileAssets):
             logger.exception("Cannot get size of the S3 bucket folder. Exception: {}".format(str(e)))
         return size
 
-    def get_access(self, filename, seconds=0):
+    def get_access(self, filename, seconds=0, short=True):
         response = None
         try:
             public = self._check_public(filename)
@@ -119,7 +119,7 @@ class S3Files(FileAssets):
             if (not seconds or seconds == 0) and not public:
                 public = self._set_public(filename)
 
-            if public:
+            if public and short:
                 response = "https://{}.s3.amazonaws.com/{}".format(self.s3_bucket_name, filename)
                 short_url = self.shorten_url(response)
                 if short_url:
@@ -133,11 +133,11 @@ class S3Files(FileAssets):
                     },
                     ExpiresIn=seconds
                 )
-            
+
         except Exception as e:
             logger.exception("Not able to give access to {} for {} seconds. Exception".format(filename, seconds, str(e)))
-        return response 
-    
+        return response
+
     def get_upload_access(self, filename, seconds=0):
         response = None
 
@@ -151,16 +151,16 @@ class S3Files(FileAssets):
                 },
                 ExpiresIn=seconds
             )
-            
+
         except Exception as e:
             logger.exception("Not able to give access to {} for {} seconds. Exception".format(filename, seconds, str(e)))
-        return response 
+        return response
 
     def get_folder(self, path):
         try:
             local_folder = os.path.realpath("{}{}".format(self.local_store, path))
             logger.info("Getting folder from s3 {}, into local folder {}".format(path, local_folder))
-            bucket = self.resource.Bucket(self.s3_bucket_name) 
+            bucket = self.resource.Bucket(self.s3_bucket_name)
             for obj in bucket.objects.filter(Prefix=path):
                 try:
                     logger.info("Downloading file {}".format(obj.key))
