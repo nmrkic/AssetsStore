@@ -125,4 +125,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
+# Ignore sublime files
+*.sublime-*
