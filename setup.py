@@ -43,7 +43,7 @@ setup(
         "boto==2.49.0",
         "azure-storage-blob==1.5.0",
         "paramiko==2.6.0",
-        "requests==2.23.0"
+        "requests>=2.23.0"
     ],
     dependency_links=[
     ],
