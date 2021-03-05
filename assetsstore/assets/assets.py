@@ -8,6 +8,7 @@ import json
 
 logger = logging.getLogger(__name__)
 
+
 class FileAssets(object):
     __metaclass__ = abc.ABCMeta
 
@@ -40,7 +41,6 @@ class FileAssets(object):
             for d in dirs:
                 self._put_folder("{}/{}".format(path,d).replace("//", "/"))
 
-
     @abc.abstractmethod
     def put_file(self, filename):
         raise "Not implemented abstract method"
@@ -70,7 +70,7 @@ class FileAssets(object):
                 asset = sub_cls
         if not asset:
             raise Exception("""There is no asset by name '{}' please set environment variable ASSET_STORE to one of the following:
-                LocalFiles, ServerFiles, S3Files""".format(selected))
+                LocalFiles, ServerFiles, S3Files, AzureFiles""".format(selected))
         return asset()
 
     def compress(self, file):
