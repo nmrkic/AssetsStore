@@ -4,13 +4,13 @@ A setuptools based setup module.
 
 from setuptools import setup, find_packages
 from os import path
-import assetsstore
 import re
 
 # Get the long description from the README file
 here = path.abspath(path.dirname(__file__))
 with open(path.join(here, "README.md")) as f:
     long_description = f.read()
+
 
 def find_version(*file_paths):
     """
@@ -24,6 +24,7 @@ def find_version(*file_paths):
         return lookup.group(1)
 
     raise RuntimeError("Unable to find version string.")
+
 
 setup(
     name="AssetsStore",
@@ -41,7 +42,7 @@ setup(
         "overrides>=1.8",
         "boto3==1.9.228",
         "boto==2.49.0",
-        "azure-storage-blob==1.5.0",
+        "azure-storage-blob==12.8.0",
         "paramiko==2.6.0",
         "requests>=2.23.0"
     ],
