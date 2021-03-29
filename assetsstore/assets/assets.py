@@ -45,10 +45,12 @@ class FileAssets(object):
     def put_file(self, filename):
         raise "Not implemented abstract method"
 
-    def save_and_push(self, file, filename):
+    def save_and_push(self, file, filename, randomise=True):
         match_path, ext = os.path.splitext(filename)
-        randomise_name = '{}-{}{}'.format(match_path, uuid.uuid4().hex, ext)
-        saved_filename = '{}'.format(randomise_name)
+        saved_filename = filename
+        if randomise:
+            randomise_name = '{}-{}{}'.format(match_path, uuid.uuid4().hex, ext)
+            saved_filename = '{}'.format(randomise_name)
         full_filename = os.path.realpath("{}{}".format(self.local_store, saved_filename))
         with open(full_filename, 'wb') as model_file:
             model_file.write(file.read())
