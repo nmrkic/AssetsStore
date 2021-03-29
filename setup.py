@@ -42,7 +42,7 @@ setup(
         "overrides>=1.8",
         "boto3==1.9.228",
         "boto==2.49.0",
-        "azure-storage-blob==2.1.0",
+        "azure-storage-blob==2.0.0",
         "paramiko==2.6.0",
         "requests>=2.25.0",
         "urllib3==1.25.9"
