@@ -31,7 +31,7 @@ class FileAssets(object):
         raise "Not implemented abstract method"
 
     def put_folder(self, path):
-        local_folder = "{}{}".format(self.local_store, path)
+        # local_folder = "{}{}".format(self.local_store, path)
         self._put_folder(path)
 
     def _put_folder(self, path):
