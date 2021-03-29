@@ -3,7 +3,7 @@ import os
 # import sys
 import logging
 from pathlib import Path
-from azure.storage.blob import BlockBlobService, BlobPermissions
+from azure.storage.blob import BlobServiceClient, BlobPermissions
 import datetime as dt
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ class AzureFiles(FileAssets):
         self.azure_storage_container = os.getenv("ASSET_LOCATION")
         self.azure_storage_url = os.getenv("ASSET_PUBLIC_URL")
 
-        self.connection = BlockBlobService(
+        self.connection = BlobServiceClient(
             account_name=self.azure_storage_name,
             account_key=self.azure_storage_key,
         )
