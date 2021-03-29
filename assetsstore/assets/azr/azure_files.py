@@ -37,7 +37,7 @@ class AzureFiles(FileAssets):
             BlobPermissions.READ,
             dt.datetime.utcnow() + dt.timedelta(seconds=seconds)
         )
-        response = "{}/{}/{}/{}".format(
+        response = "{}/{}/{}?{}".format(
             self.azure_storage_url,
             self.azure_storage_container,
             filename,
