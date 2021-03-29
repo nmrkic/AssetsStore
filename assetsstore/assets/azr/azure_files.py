@@ -3,7 +3,7 @@ import os
 # import sys
 import logging
 from pathlib import Path
-from azure.storage.blob import BlobServiceClient, BlobPermissions
+from azure.storage.blob import BlockBlobService, BlobPermissions
 import datetime as dt
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ class AzureFiles(FileAssets):
         self.azure_storage_container = os.getenv("ASSET_LOCATION")
         self.azure_storage_url = os.getenv("ASSET_PUBLIC_URL")
 
-        self.connection = BlobServiceClient(
+        self.connection = BlockBlobService(
             account_name=self.azure_storage_name,
             account_key=self.azure_storage_key,
         )
@@ -32,10 +32,10 @@ class AzureFiles(FileAssets):
         if not seconds:
             seconds = 60 * 60 * 12  # 12 hours
         sas_url = self.connection.generate_blob_shared_access_signature(
-            self.azure_storage_container,
-            filename,
-            BlobPermissions.READ,
-            dt.datetime.utcnow() + dt.timedelta(seconds=seconds)
+            container_name=self.azure_storage_container,
+            blob_name=filename,
+            permission=BlobPermissions.READ,
+            expiry=dt.datetime.utcnow() + dt.timedelta(seconds=seconds)
         )
         response = "{}/{}/{}?{}".format(
             self.azure_storage_url,
