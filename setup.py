@@ -45,7 +45,7 @@ setup(
         "azure-storage-blob==2.1.0",
         "paramiko==2.6.0",
         "requests>=2.25.0",
-        "urllib3==1.25.9"
+        "urllib3==1.26.5"
     ],
     dependency_links=[
     ],
