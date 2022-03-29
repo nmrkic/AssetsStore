@@ -43,7 +43,7 @@ setup(
         "boto3==1.9.228",
         "boto==2.49.0",
         "azure-storage-blob==2.1.0",
-        "paramiko==2.6.0",
+        "paramiko==2.10.1",
         "requests>=2.25.0",
         "urllib3==1.25.9"
     ],
