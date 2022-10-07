@@ -5,14 +5,14 @@ import os
 import logging
 
 
-class AsssetsS3Test(TestCase):
+class AsssetsLocalTest(TestCase):
 
     def setUp(self):
         self.maxDiff = None
         logging.basicConfig(level=logging.INFO)
 
     def test_no_asset_store_set(self):
-        os.environ["ASSET_STORE"]=""
+        os.environ["ASSET_STORE"] = ""
         with self.assertRaises(Exception) as context:
             FileAssets.get_asset()
         print(context.exception)
@@ -20,12 +20,12 @@ class AsssetsS3Test(TestCase):
 
     def test_upload_and_download_from_local(self):
         # get set store
-        os.environ["ASSET_STORE"]="LocalFiles"
+        os.environ["ASSET_STORE"] = "LocalFiles"
 
-        os.environ["ASSET_ACCESS_KEY_ID"]=""
-        os.environ["ASSET_SECRET_ACCESS_KEY"]=""
-        os.environ["ASSET_LOCATION"]="assetsstore/tests/results/remote/"
-        os.environ["ASSET_REGION"]=""
+        os.environ["ASSET_ACCESS_KEY_ID"] = ""
+        os.environ["ASSET_SECRET_ACCESS_KEY"] = ""
+        os.environ["ASSET_LOCATION"] = "assetsstore/tests/results/remote/"
+        os.environ["ASSET_REGION"] = ""
 
         os.environ["LOCAL_STORE"] = "assetsstore/tests/fixtures/"
         handler = FileAssets.get_asset()
