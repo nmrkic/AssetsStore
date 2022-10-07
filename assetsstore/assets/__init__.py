@@ -4,7 +4,7 @@ from .server import ServerFiles
 from .local import LocalFiles
 from .azr import AzureFiles
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 __all__ = [
     "FileAssets",

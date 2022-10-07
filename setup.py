@@ -32,7 +32,7 @@ setup(
     description="Python package storing files to selected storage like AWS S3 or just Instance of a linux server via SSH",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="",
+    url="https://github.com/nmrkic/AssetsStore",
     packages=find_packages(exclude=["doc"]),
     include_package_data=True,
     namespace_packages=["assetsstore"],
