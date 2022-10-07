@@ -31,6 +31,7 @@ setup(
     version=find_version("assetsstore", "assets", "__init__.py"),
     description="Python package storing files to selected storage like AWS S3 or just Instance of a linux server via SSH",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     url="",
     packages=find_packages(exclude=["doc"]),
     include_package_data=True,
@@ -39,7 +40,6 @@ setup(
     author_email="mrkic.nebojsa@gmail.com",
     license="Apache 2.0",
     install_requires=[
-        "overrides>=1.8",
         "boto3==1.9.228",
         "boto==2.49.0",
         "azure-storage-blob==2.1.0",
@@ -55,7 +55,6 @@ setup(
         "mock",
     ],
     classifiers=[
-        'Development Status :: 1 - Planning',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
