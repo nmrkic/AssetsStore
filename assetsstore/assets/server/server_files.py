@@ -1,9 +1,10 @@
 from assetsstore.assets import FileAssets
-from shutil import copyfile
-from pathlib import Path
+import pathlib
 import logging
 import paramiko
 import os
+import stat
+
 
 logger = logging.getLogger(__name__)
 
@@ -13,12 +14,17 @@ class ServerFiles(FileAssets):
     def __init__(self):
         self.server = os.getenv("ASSET_SERVER")
         self.username = os.getenv("ASSET_ACCESS_KEY")
-        self.password = os.getenv("ASSET_SECRET_ACCESS_KEY")
         self.location = os.getenv("ASSET_LOCATION", "")
         self.server_url = os.getenv("ASSET_PUBLIC_URL", "")
         self.ssh = paramiko.SSHClient()
         self.ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
-        self.ssh.connect(self.server, username=self.username, password=self.password)
+        pkey_path = os.getenv("ASSET_PRIVATE_KEY", None)
+        if pkey_path:
+            self.pkey = paramiko.Ed25519Key.from_private_key_file(pkey_path)
+            self.ssh.connect(self.server, username=self.username, pkey=self.pkey, banner_timeout=200)
+        else:
+            self.password = os.getenv("ASSET_SECRET_ACCESS_KEY")
+            self.ssh.connect(self.server, username=self.username, password=self.password)
         super().__init__()
 
     def get_access(self, filename, seconds):
@@ -29,39 +35,51 @@ class ServerFiles(FileAssets):
 
     def get_size(self, folder):
         size = 0
+        asset_folder = "{}{}".format(self.location, folder)
+        sftp = self.ssh.open_sftp()
+        for i in sftp.listdir_attr(asset_folder):
+            size = i.st_size
         return size
 
     def listdir_r(self, sftp, remotedir):
         file_list = []
+        print(f"remotedir {remotedir}")
         for entry in sftp.listdir_attr(remotedir):
             remotepath = remotedir + "/" + entry.filename
             mode = entry.st_mode
-            if S_ISDIR(mode):
-                file_list.extend(listdir_r(sftp, remotepath))
-            elif S_ISREG(mode):
+            if stat.S_ISDIR(mode):
+                file_list.extend(self.listdir_r(sftp, remotepath))
+            elif stat.S_ISREG(mode):
                 file_list.append(remotepath)
         return file_list
 
     def get_folder(self, path):
         try:
+            print(f"start path {path}")
             sftp = self.ssh.open_sftp()
-            for r_file in self.listdir_r(sftp, path):
-                folder_path = pathlib.Path("/".join(local_filename.split("/")[:-1]))
+            asset_folder = "{}{}".format(self.location, path)
+            for r_file in self.listdir_r(sftp, asset_folder):
+                folder_path = pathlib.Path("/".join(r_file.split("/")[:-1]))
+                print(f"folder_path {folder_path}")
                 folder_path.mkdir(parents=True, exist_ok=True)
-                self.get_file(r_file)
+                self.get_file(r_file.replace(self.location, ""))
 
             sftp.close()
         except Exception as e:
             logger.exception("Failed to read remote folder. Exception {}".format(str(e)))
         return 'Downloaded'
+
     def get_file(self, filename):
 
-        asset_filename = os.path.realpath("{}{}".format(self.location, filename))
+        asset_filename = "{}{}".format(self.location, filename)
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
+        print(f"get_file asset: {asset_filename}, local: {local_filename}")
         try:
-            local_file = Path(local_filename)
+            local_file = pathlib.Path(local_filename)
             if not local_file.is_file():
                 sftp = self.ssh.open_sftp()
+                folder_path = pathlib.Path("{}{}".format(self.local_store, "/".join(filename.split("/")[:-1])))
+                folder_path.mkdir(parents=True, exist_ok=True)
                 sftp.get(asset_filename, local_filename)
                 sftp.close()
             else:
@@ -73,10 +91,11 @@ class ServerFiles(FileAssets):
         return "Downloaded"
 
     def put_file(self, filename):
-        asset_filename = os.path.realpath("{}{}".format(self.location, filename))
+        asset_filename = "{}{}".format(self.location, filename)
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
+        print(asset_filename, local_filename)
         try:
-            local_file = Path(local_filename)
+            local_file = pathlib.Path(local_filename)
             if local_file.is_file():
                 sftp = self.ssh.open_sftp()
                 sftp.put(local_filename, asset_filename)
@@ -90,7 +109,8 @@ class ServerFiles(FileAssets):
         return "Uploaded"
 
     def del_file(self, filename, archive=False):
-        asset_filename = os.path.realpath("{}{}".format(self.location, filename))
+        asset_filename = "{}{}".format(self.location, filename)
+        print(asset_filename)
         if os.path.exists(asset_filename):
             try:
                 sftp = self.ssh.open_sftp()

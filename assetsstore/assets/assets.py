@@ -39,7 +39,7 @@ class FileAssets(object):
             for f in files:
                 self.put_file("{}/{}".format(root.replace(self.local_store, ""), f))
             for d in dirs:
-                self._put_folder("{}/{}".format(path,d).replace("//", "/"))
+                self._put_folder("{}/{}".format(path, d).replace("//", "/"))
 
     @abc.abstractmethod
     def put_file(self, filename):
