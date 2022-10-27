@@ -27,6 +27,7 @@ class FileAssets(object):
     def get_file(self, filename):
         raise "Not implemented abstract method"
 
+    @abc.abstractmethod
     def get_access(self, filename, seconds):
         raise "Not implemented abstract method"
 
@@ -72,7 +73,7 @@ class FileAssets(object):
                 asset = sub_cls
         if not asset:
             raise Exception("""There is no asset by name '{}' please set environment variable ASSET_STORE to one of the following:
-                LocalFiles, ServerFiles, S3Files, AzureFiles""".format(selected))
+                LocalFiles, ServerFiles, S3Files, AzureFiles, MinioFiles""".format(selected))
         return asset()
 
     def compress(self, file):
