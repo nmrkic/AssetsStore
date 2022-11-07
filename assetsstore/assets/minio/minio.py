@@ -27,14 +27,16 @@ class MinioFiles(FileAssets):
         super().__init__()
 
     def _check_public(self, filename):
+        response = None
         try:
             response = self.client.get_object(self.bucket_name, filename)
             success = True
         except Exception as e:
             success = False
             logger.warn("Cannot access bucket object. Exception {}".format(str(e)))
-        response.close()
-        response.release_conn()
+        if response:
+            response.close()
+            response.release_conn()
         return success
 
     def _set_public(self, filename):
