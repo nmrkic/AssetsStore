@@ -5,9 +5,7 @@ import boto3
 import logging
 from pathlib import Path
 import threading
-
-from boto3.s3.transfer import TransferConfig
-from boto.s3.connection import S3Connection
+from botocore.client import Config
 
 logger = logging.getLogger(__name__)
 
@@ -67,11 +65,15 @@ class S3Files(FileAssets):
                 aws_access_key_id=self.aws_access_key_id,
                 aws_secret_access_key=self.aws_secret_access_key,
             )
-            self.boto2_connection = S3Connection(self.aws_access_key_id, self.aws_secret_access_key)
         else:
             session = boto3.Session()
-            self.boto2_connection = S3Connection()
-        self.connection = session.client('s3')
+        self.connection = session.client(
+            's3',
+            config=Config(
+                region_name=self.region_name,
+                signature_version="s3v4"
+            )
+        )
         self.upload_connection = session.client(
             's3',
             config=boto3.session.Config(
@@ -79,14 +81,21 @@ class S3Files(FileAssets):
                 signature_version='s3v4'
             )
         )
-
         self.resource = session.resource('s3')
         super().__init__()
 
     def _check_public(self, filename):
         try:
             acl_object = self.resource.ObjectAcl(self.s3_bucket_name, filename)
-            if [x for x in  acl_object.grants if x.get('Grantee',{}).get('URI', '') == 'http://acs.amazonaws.com/groups/global/AllUsers']:
+            if [
+                    x for x in acl_object.grants if x.get(
+                        'Grantee',
+                        {}
+                    ).get(
+                        'URI',
+                        ''
+                    ) == 'http://acs.amazonaws.com/groups/global/AllUsers'
+            ]:
                 return True
         except Exception as e:
             logger.warn("Cannot access bucket object. Exception {}".format(str(e)))
@@ -136,13 +145,6 @@ class S3Files(FileAssets):
                     },
                     ExpiresIn=seconds
                 )
-                # response = self.boto2_connection.generate_url(
-                #     seconds,
-                #     "GET",
-                #     bucket=self.s3_bucket_name,
-                #     key=filename,
-                #     query_auth=True
-                # )
 
         except Exception as e:
             logger.exception("Not able to give access to {} for {} seconds. Exception".format(filename, seconds, str(e)))

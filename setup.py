@@ -40,12 +40,11 @@ setup(
     author_email="mrkic.nebojsa@gmail.com",
     license="Apache 2.0",
     install_requires=[
-        "boto3==1.24.88",
-        "boto==2.49.0",
+        "boto3>=1.26.66",
         "azure-storage-blob==2.1.0",
-        "paramiko==2.11.0",
-        "requests>=2.28.1",
-        "urllib3>=1.26.12",
+        "paramiko>=2.11.0",
+        "requests>=2.28.2",
+        "urllib3==1.26",
         "minio>=7.1.13"
     ],
     dependency_links=[
