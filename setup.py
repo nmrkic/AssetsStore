@@ -53,6 +53,7 @@ setup(
     tests_require=[
         "pytest",
         "mock",
+        "requests"
     ],
     classifiers=[
         'Environment :: Web Environment',

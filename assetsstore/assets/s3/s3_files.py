@@ -123,10 +123,12 @@ class S3Files(FileAssets):
             logger.exception("Cannot get size of the S3 bucket folder. Exception: {}".format(str(e)))
         return size
 
-    def get_access(self, filename, seconds=0, short=True):
+    def get_access(self, filename, seconds=0, short=True, download_filename=""):
         response = None
         try:
             public = self._check_public(filename)
+            if not download_filename:
+                download_filename = filename
 
             if (not seconds or seconds == 0) and not public:
                 public = self._set_public(filename)
@@ -142,12 +144,13 @@ class S3Files(FileAssets):
                     Params={
                         'Bucket': self.s3_bucket_name,
                         'Key': filename,
+                        'ResponseContentDisposition': f"attachment;filename={download_filename}"
                     },
                     ExpiresIn=seconds
                 )
 
         except Exception as e:
-            logger.exception("Not able to give access to {} for {} seconds. Exception".format(filename, seconds, str(e)))
+            logger.exception("Not able to give access to {} for {} seconds. Exception {}".format(filename, seconds, str(e)))
         return response
 
     def get_upload_access(self, filename, seconds=0):
