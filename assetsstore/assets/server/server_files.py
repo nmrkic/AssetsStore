@@ -27,7 +27,7 @@ class ServerFiles(FileAssets):
             self.ssh.connect(self.server, username=self.username, password=self.password)
         super().__init__()
 
-    def get_access(self, filename, seconds):
+    def get_access(self, filename, seconds=0, short=True, download_filename=""):
         return "{}{}".format(self.server_url, filename)
 
     def get_upload_access(self, filename, seconds):

@@ -168,7 +168,7 @@ class S3Files(FileAssets):
             )
 
         except Exception as e:
-            logger.exception("Not able to give access to {} for {} seconds. Exception".format(filename, seconds, str(e)))
+            logger.exception("Not able to give access to {} for {} seconds. Exception {}".format(filename, seconds, str(e)))
         return response
 
     def get_folder(self, path):
@@ -225,7 +225,7 @@ class S3Files(FileAssets):
                     {"Bucket": self.s3_bucket_name, "Key": filename},
                     self.s3_bucket_name,
                     filename,
-                    ExtraArgs = {
+                    ExtraArgs={
                         "StorageClass": "GLACIER",
                         "MetadataDirective": "COPY"
                     }

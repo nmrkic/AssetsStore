@@ -28,7 +28,7 @@ class AzureFiles(FileAssets):
         # TODO add azure functionality to get size of folder
         return size
 
-    def get_access(self, filename, seconds=0, short=True):
+    def get_access(self, filename, seconds=0, short=True, download_file=""):
         if not seconds:
             seconds = 60 * 60 * 12  # 12 hours
         sas_url = self.connection.generate_blob_shared_access_signature(
