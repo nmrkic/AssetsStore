@@ -14,7 +14,7 @@ class LocalFiles(FileAssets):
         self.server_url = os.getenv("ASSET_PUBLIC_URL", "error")
         super().__init__()
 
-    def get_access(self, filename, seconds):
+    def get_access(self, filename, seconds=0, short=True, download_filename=""):
         return "{}{}".format(self.server_url, filename)
 
     def get_upload_access(self, filename, seconds):
