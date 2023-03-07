@@ -5,7 +5,7 @@ from .local import LocalFiles
 from .azr import AzureFiles
 from .minio import MinioFiles
 
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 
 __all__ = [
     "FileAssets",
