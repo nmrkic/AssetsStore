@@ -32,8 +32,8 @@ class FileAssets(object):
         raise "Not implemented abstract method"
 
     def put_folder(self, path):
-        # local_folder = "{}{}".format(self.local_store, path)
-        self._put_folder(path)
+        local_folder = "{}{}".format(self.local_store, path)
+        self._put_folder(local_folder)
 
     def _put_folder(self, path):
         for root, dirs, files in os.walk(path):
@@ -62,6 +62,10 @@ class FileAssets(object):
 
     @abc.abstractmethod
     def del_file(self, filename, archive=False):
+        raise "Not implemented abstract method"
+
+    @abc.abstractmethod
+    def del_folder(self, filename):
         raise "Not implemented abstract method"
 
     @classmethod

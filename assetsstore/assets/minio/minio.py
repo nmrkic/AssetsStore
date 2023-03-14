@@ -128,6 +128,17 @@ class MinioFiles(FileAssets):
             return "Failed"
         return "Downloaded"
 
+    def del_folder(self, path):
+        objects = self.client.list_objects(self.bucket_name, prefix=path, recursive=True)
+        try:
+            objects = [x._object_name for x in objects]
+            for obj in objects:
+                self.del_file(obj)
+        except Exception as e:
+            logger.exception("Delete file from s3 failed with error: {}".format(str(e)))
+            return "Not Deleted"
+        return "Deleted"
+
     def get_file(self, filename):
         try:
             full_filename = os.path.realpath("{}{}".format(self.local_store, filename))
