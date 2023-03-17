@@ -190,6 +190,16 @@ class S3Files(FileAssets):
             return "Failed"
         return "Downloaded"
 
+    def del_folder(self, path):
+        bucket = self.resource.Bucket(self.s3_bucket_name)
+        for obj in bucket.objects.filter(Prefix=path):
+            try:
+                self.del_file(obj.key)
+            except Exception as e:
+                logger.exception("Delete file from s3 failed with error: {}".format(str(e)))
+                return "Not Deleted"
+        return "Deleted"
+
     def get_file(self, filename):
         try:
             full_filename = os.path.realpath("{}{}".format(self.local_store, filename))
