@@ -5,6 +5,7 @@ import logging
 import json
 from pathlib import Path
 from minio import Minio
+from urllib.parse import urlunsplit
 from .progress import Progress
 
 logger = logging.getLogger(__name__)
@@ -84,7 +85,9 @@ class MinioFiles(FileAssets):
                 public = self._set_public(filename)
 
             if public and short:
-                response = f"{self.host}/{filename}"
+                base_url = self.client._base_url._url
+                base_url = urlunsplit(base_url)
+                response = f"{base_url}/{self.bucket_name}/{filename}"
                 short_url = self.shorten_url(response)
                 if short_url:
                     response = short_url
