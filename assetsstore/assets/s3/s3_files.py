@@ -74,13 +74,6 @@ class S3Files(FileAssets):
                 signature_version="s3v4"
             )
         )
-        self.upload_connection = session.client(
-            's3',
-            config=boto3.session.Config(
-                s3={'addressing_style': 'path'},
-                signature_version='s3v4'
-            )
-        )
         self.resource = session.resource('s3')
         super().__init__()
 
@@ -118,7 +111,6 @@ class S3Files(FileAssets):
             for key in bucket.objects.filter(Prefix=folder):
                 if key.meta.data.get('StorageClass', "") == "STANDARD":
                     size += key.size
-
         except Exception as e:
             logger.exception("Cannot get size of the S3 bucket folder. Exception: {}".format(str(e)))
         return size
@@ -158,7 +150,7 @@ class S3Files(FileAssets):
 
         # Set the desired multipart threshold value (5GB)
         try:
-            response = self.upload_connection.generate_presigned_url(
+            response = self.connection.generate_presigned_url(
                 ClientMethod='put_object',
                 Params={
                     'Bucket': self.s3_bucket_name,
@@ -189,6 +181,16 @@ class S3Files(FileAssets):
             logger.warn("Error occured while downloading folder from s3 {}".format(str(e)))
             return "Failed"
         return "Downloaded"
+
+    def del_folder(self, path):
+        bucket = self.resource.Bucket(self.s3_bucket_name)
+        for obj in bucket.objects.filter(Prefix=path):
+            try:
+                self.del_file(obj.key)
+            except Exception as e:
+                logger.exception("Delete file from s3 failed with error: {}".format(str(e)))
+                return "Not Deleted"
+        return "Deleted"
 
     def get_file(self, filename):
         try:

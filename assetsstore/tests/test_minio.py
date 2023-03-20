@@ -82,6 +82,13 @@ class AsssetsLocalTest(TestCase):
         self.assertEqual(200, requests.get(url).status_code)
         self.assertEqual("Deleted", handler.del_file("test.txt"))
 
+    def test_get_access_for_public(self):
+        handler = FileAssets.get_asset()
+        self.assertEqual("Uploaded", handler.put_file("test_folder/test2.txt"))
+        test = handler.get_access("test_folder", short=True)
+        self.assertEqual("Deleted", handler.del_file("test_folder/test2.txt"))
+        self.assertEqual(test, "http://localhost:9000/test/test_folder")
+
     def test_get_folder_size(self):
         handler = FileAssets.get_asset()
         self.assertEqual("Uploaded", handler.put_file("test_folder/test2.txt"))
