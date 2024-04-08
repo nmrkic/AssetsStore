@@ -16,9 +16,8 @@ def find_version(*file_paths):
     """
     Reads out software version from provided path(s).
     """
-    version_file = open("/".join(file_paths), 'r').read()
-    lookup = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                       version_file, re.M)
+    version_file = open("/".join(file_paths), "r").read()
+    lookup = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
 
     if lookup:
         return lookup.group(1)
@@ -40,27 +39,30 @@ setup(
     author_email="mrkic.nebojsa@gmail.com",
     license="Apache 2.0",
     install_requires=[
-        "boto3>=1.26.66",
-        "azure-storage-blob==2.1.0",
-        "paramiko>=2.11.0",
         "requests>=2.28.2",
-        "urllib3==1.26",
-        "minio>=7.1.13"
+        "urllib3>=2.0.0",
     ],
-    dependency_links=[
-    ],
+    extras_require={
+        "s3": [
+            "boto3>=1.26.66",
+        ],
+        "azure": [
+            "azure-storage-blob==2.1.0",
+        ],
+        "server": [
+            "paramiko>=3.2.0",
+        ],
+        "minio": ["minio>=7.1.13"],
+    },
+    dependency_links=[],
     setup_requires=["pytest-runner"],
-    tests_require=[
-        "pytest",
-        "mock",
-        "requests"
-    ],
+    tests_require=["pytest", "mock", "requests"],
     classifiers=[
-        'Environment :: Web Environment',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3.7',
+        "Environment :: Web Environment",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3.7",
     ],
 )
