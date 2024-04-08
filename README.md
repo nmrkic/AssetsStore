@@ -16,9 +16,9 @@ The project is using python 3.10 but should support newer versions, it relies on
 
 ## How to use
 
-Install with pip:
+Install with pip depending on which type of storage do you use (s3,server,azure,minio are choices):
 
-``` pip install AssetsStore ```
+``` pip install AssetsStore[s3] ```
 
 Set environment variables dependent on what upload you are using:
 
