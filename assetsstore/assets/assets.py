@@ -9,51 +9,85 @@ import json
 logger = logging.getLogger(__name__)
 
 
-class FileAssets(object):
-    __metaclass__ = abc.ABCMeta
+class FileAssets(metaclass=abc.ABCMeta):
+    """
+    The `FileAssets` class is an abstract base class that provides
+    a common interface for working with different types of file assets.
+    It defines abstract methods that need to be implemented by its subclasses.
+    The class also provides some common functionality for working with files,
+    such as uploading, downloading, and deleting files.
+    """
 
     def __init__(self):
-        self.local_store = os.getenv("LOCAL_STORE", "")
+        """
+        Initializes the `FileAssets` object and sets the
+        local store path based on the LOCAL_STORE environment variable.
+        This variable is important since our local store paths will act as
+        a medium between the asset store and the local file system.
+        """
+        self.local_store = os.getenv("LOCAL_STORE")
 
     @abc.abstractmethod
-    def get_folder(self, path):
-        raise "Not implemented abstract method"
+    def get_folder(self, path: str):
+        """
+        Abstract method that needs to be implemented by subclasses.
+        Retrieves a folder from the asset store.
+        """
+        raise NotImplementedError
 
     @abc.abstractmethod
-    def get_size(self, folder):
-        raise "Not implemented abstract method"
+    def get_file(self, filename: str):
+        """
+        Abstract method that needs to be implemented by subclasses.
+        Retrieves a file from the asset store.
+        """
+        raise NotImplementedError
 
     @abc.abstractmethod
-    def get_file(self, filename):
-        raise "Not implemented abstract method"
+    def get_access(self, filename: str, seconds: int):
+        """
+        Abstract method that needs to be implemented by subclasses.
+        Retrieves access to a file for a specified duration.
+        """
+        raise NotImplementedError
 
-    @abc.abstractmethod
-    def get_access(self, filename, seconds):
-        raise "Not implemented abstract method"
-
-    def put_folder(self, path):
-        local_folder = "{}{}".format(self.local_store, path)
+    def put_folder(self, path: str):
+        """
+        Uploads a folder to the asset store by
+        recursively uploading all files and subfolders.
+        """
+        local_folder = os.path.join(self.local_store, path)
         self._put_folder(local_folder)
 
-    def _put_folder(self, path):
+    def _put_folder(self, path: str):
+        """
+        Helper method for uploading a folder and its contents.
+        """
         for root, dirs, files in os.walk(path):
             for f in files:
-                self.put_file("{}/{}".format(root.replace(self.local_store, ""), f))
+                self.put_file(os.path.join(root.replace(self.local_store, ""), f))
             for d in dirs:
-                self._put_folder("{}/{}".format(path, d).replace("//", "/"))
+                self._put_folder(os.path.join(path, d).replace("//", "/"))
 
     @abc.abstractmethod
-    def put_file(self, filename):
-        raise "Not implemented abstract method"
+    def put_file(self, filename: str):
+        """
+        Abstract method that needs to be implemented by subclasses.
+        Uploads a file to the asset store.
+        """
+        raise NotImplementedError
 
-    def save_and_push(self, file, filename, randomise=True):
+    def save_and_push(self, file: str, filename: str, randomise: bool = True):
+        """
+        Saves a file locally and then uploads it to the asset store.
+        """
         match_path, ext = os.path.splitext(filename)
         saved_filename = filename
         if randomise:
-            randomise_name = '{}-{}{}'.format(match_path, uuid.uuid4().hex, ext)
-            saved_filename = '{}'.format(randomise_name)
-        full_filename = os.path.realpath("{}{}".format(self.local_store, saved_filename))
-        with open(full_filename, 'wb') as model_file:
+            randomise_name = "{}-{}{}".format(match_path, uuid.uuid4().hex, ext)
+            saved_filename = "{}".format(randomise_name)
+        full_filename = os.path.realpath(os.path.join(self.local_store, saved_filename))
+        with open(full_filename, "wb") as model_file:
             model_file.write(file.read())
 
         self.put_file(saved_filename)
@@ -61,71 +95,93 @@ class FileAssets(object):
         return saved_filename
 
     @abc.abstractmethod
-    def del_file(self, filename, archive=False):
-        raise "Not implemented abstract method"
-
-    @abc.abstractmethod
-    def del_folder(self, filename):
-        raise "Not implemented abstract method"
+    def del_file(self, filename: str, archive: bool = False):
+        """
+        Abstract method that needs to be implemented by subclasses.
+        Deletes a file from the asset store.
+        """
+        raise NotImplementedError
 
     @classmethod
     def get_asset(cls):
+        """
+        Class method that returns an instance of the appropriate
+        subclass based on the value of the ASSET_STORE environment variable.
+        """
         asset = None
-        selected = os.getenv("ASSET_STORE", "")
+        selected = os.getenv("ASSET_STORE")
         for sub_cls in cls.__subclasses__():
             if selected.lower() == sub_cls.__name__.lower():
                 asset = sub_cls
         if not asset:
-            raise Exception("""There is no asset by name '{}' please set environment variable ASSET_STORE to one of the following:
-                LocalFiles, ServerFiles, S3Files, AzureFiles, MinioFiles""".format(selected))
+            raise Exception(
+                """There is no asset by name '{}' please set environment variable
+                ASSET_STORE to one of the following:
+                LocalFiles, ServerFiles, S3Files, AzureFiles, MinioFiles""".format(
+                    selected
+                )
+            )
         return asset()
 
-    def compress(self, file):
-        with zipfile.ZipFile(file.replace('.csv', '.zip'), 'w', zipfile.ZIP_DEFLATED) as zipped:
-            zipped.write(file, file.split('/')[-1])
-        return file.replace('.csv', '.zip')
+    def compress(self, file: str):
+        """
+        Compresses a file into a ZIP archive.
+        """
+        with zipfile.ZipFile(
+            file.replace(".csv", ".zip"), "w", zipfile.ZIP_DEFLATED
+        ) as zipped:
+            zipped.write(file, file.split("/")[-1])
+        return file.replace(".csv", ".zip")
 
-    def del_local_file(self, filename):
-        local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
+    def del_local_file(self, filename: str):
+        """
+        Deletes a file from the local store.
+        """
+        local_filename = os.path.realpath(os.path.join(self.local_store, filename))
         if os.path.exists(local_filename):
             try:
                 os.remove(local_filename)
-                return "Deleted"
+                return True
             except Exception as e:
-                logger.exception("Delete local file failed with error: {}".format(str(e)))
+                logger.exception(
+                    "Delete local file failed with error: {}".format(str(e))
+                )
         else:
             logger.info("Local file does not exist {}".format(local_filename))
-        return "Not Deleted"
+        return False
 
-    def shorten_url(self, url):
+    def shorten_url(self, url: str):
+        """
+        Shortens a URL using the Rebrandly API.
+        """
         try:
             linkRequest = {
                 "destination": url,
-                "domain": {"fullName": os.getenv("REBRAND_DOMAIN", "rebrand.ly")}
-                # , "slashtag": "A_NEW_SLASHTAG"
-                # , "title": "Rebrandly YouTube channel"
+                "domain": {"fullName": os.getenv("REBRAND_DOMAIN", "rebrand.ly")},
             }
 
             requestHeaders = {
                 "Content-type": "application/json",
                 "apikey": os.getenv("REBRAND_KEY"),
-                # "workspace": "YOUR_WORKSPACE_ID"
             }
 
             r = requests.post(
                 "https://api.rebrandly.com/v1/links",
                 data=json.dumps(linkRequest),
-                headers=requestHeaders
+                headers=requestHeaders,
             )
 
-            if (r.status_code == requests.codes.ok):
+            if r.status_code == requests.codes.ok:
                 link = r.json()
                 logger.info(link)
-                print("Long URL was %s, short URL is %s" % (link["destination"], link["shortUrl"]))
-                return "https://{}".format(link['shortUrl'])
+                return "https://{}".format(link["shortUrl"])
             else:
-                logger.warn("Failed getting url, code {}. Response {}".format(r.status_code, r.content))
-            return None
+                logger.warning(
+                    "Failed getting url, code {}. Response {}".format(
+                        r.status_code, r.content
+                    )
+                )
+            return False
         except Exception as e:
-            logger.warn("Issue getting shorter url. Error {}".format(str(e)))
-        return None
+            logger.warning("Issue getting shorter url. Error {}".format(str(e)))
+        return False

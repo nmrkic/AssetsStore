@@ -29,25 +29,25 @@ class AsssetsLocalTest(TestCase):
 
         os.environ["LOCAL_STORE"] = "assetsstore/tests/fixtures/"
         handler = FileAssets.get_asset()
-        self.assertEqual("Uploaded", handler.put_file("test.txt"))
+        self.assertEqual(True, handler.put_file("test.txt"))
 
         os.environ["LOCAL_STORE"] = "assetsstore/tests/results/"
         handler = FileAssets.get_asset()
-        self.assertEqual("Downloaded", handler.get_file("test.txt"))
+        self.assertEqual(True, handler.get_file("test.txt"))
 
         # get again to check if it exists
-        self.assertEqual("Exists", handler.get_file("test.txt"))
+        self.assertEqual(True, handler.get_file("test.txt"))
 
         # delete remote file
-        self.assertEqual("Deleted", handler.del_file("test.txt"))
+        self.assertEqual(True, handler.del_file("test.txt"))
 
         # delete local copy
-        self.assertEqual("Deleted", handler.del_local_file("test.txt"))
+        self.assertEqual(True, handler.del_local_file("test.txt"))
 
     def tearDown(self):
-        for file in glob.glob('results/*'):
-            if '.gitkeep' not in file:
+        for file in glob.glob("results/*"):
+            if ".gitkeep" not in file:
                 os.remove(file)
-        for file in glob.glob('results/remote/*'):
-            if '.gitkeep' not in file:
+        for file in glob.glob("results/remote/*"):
+            if ".gitkeep" not in file:
                 os.remove(file)
