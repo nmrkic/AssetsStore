@@ -1,14 +1,14 @@
 # Assets Store
 ### [**Github**](https://github.com/nmrkic/AssetsStore)
 
-This library was created to simplify upload/download of files from/to S3, Azure Storage, or your desired server. 
+This library was created to simplify the upload/download of files from/to S3, Azure Storage, or your desired server.
 
 ## Setup instructions
 
-The project is using python 3.10 but should support newer versions, it relies on boto3 lib for S3, azure-storage-blob for AzureStorage, and paramiko for server connections.
+The project is using python 3.12, it relies on boto3 lib for S3, azure-storage-blob for AzureStorage, and paramiko for server connections.
 
 
-- [Python 3.10](python.org/downloads/)
+- [Python 3.12](python.org/downloads/)
 - [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html)
 - [azure-storage-blob](https://pypi.org/project/azure-storage-blob/)
 - [paramiko](https://www.paramiko.org/)
@@ -54,7 +54,7 @@ ASSET_PUBLIC_URL="local_url_if_folder_hosted"
 LOCAL_STORE=path_to_download_folder
 ```
 
-The library has abbility to use Rebrand and to use it add these envs:
+The library has the ability to use Rebrand and to use it add these envs:
 
 ```
 REBRAND_KEY="rebrand_key"

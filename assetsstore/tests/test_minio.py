@@ -22,29 +22,29 @@ class AsssetsLocalTest(TestCase):
 
     def test_upload_and_download_from_minio(self):
         handler = FileAssets.get_asset()
-        self.assertEqual("Uploaded", handler.put_file("test.txt"))
+        self.assertEqual(True, handler.put_file("test.txt"))
 
         # change path to avoid exists on 1. step
         os.environ["LOCAL_STORE"] = "assetsstore/tests/results/"
 
         # download file
         handler = FileAssets.get_asset()
-        self.assertEqual("Downloaded", handler.get_file("test.txt"))
+        self.assertEqual(True, handler.get_file("test.txt"))
 
         # get again to check if it exists
-        self.assertEqual("Exists", handler.get_file("test.txt"))
+        self.assertEqual(True, handler.get_file("test.txt"))
 
         # delete remote file
-        self.assertEqual("Deleted", handler.del_file("test.txt"))
+        self.assertEqual(True, handler.del_file("test.txt"))
 
         # delete local copy
-        self.assertEqual("Deleted", handler.del_local_file("test.txt"))
+        self.assertEqual(True, handler.del_local_file("test.txt"))
 
     def test_get_folder_from_minio(self):
         handler = FileAssets.get_asset()
-        self.assertEqual("Uploaded", handler.put_file("test_folder/test2.txt"))
-        self.assertEqual("Downloaded", handler.get_folder("test_folder"))
-        self.assertEqual("Deleted", handler.del_file("test_folder/test2.txt"))
+        self.assertEqual(True, handler.put_file("test_folder/test2.txt"))
+        self.assertEqual(True, handler.get_folder("test_folder"))
+        self.assertEqual(True, handler.del_file("test_folder/test2.txt"))
 
     def test_get_upload_access(self):
         handler = FileAssets.get_asset()
@@ -52,7 +52,7 @@ class AsssetsLocalTest(TestCase):
 
     def test_get_download_access_private_object(self):
         handler = FileAssets.get_asset()
-        self.assertEqual("Uploaded", handler.put_file("test.txt"))
+        self.assertEqual(True, handler.put_file("test.txt"))
         policy = {
             "Version": "2012-10-17",
             "Statement": [
@@ -76,31 +76,33 @@ class AsssetsLocalTest(TestCase):
                 },
             ],
         }
-        self.assertEqual(403, requests.get(f"http://{handler.host}/test/test.txt").status_code)
+        self.assertEqual(
+            403, requests.get(f"http://{handler.host}/test/test.txt").status_code
+        )
         handler.client.set_bucket_policy("test", json.dumps(policy))
         url = handler.get_access("test.txt", short=False)
         self.assertEqual(200, requests.get(url).status_code)
-        self.assertEqual("Deleted", handler.del_file("test.txt"))
+        self.assertEqual(True, handler.del_file("test.txt"))
 
     def test_get_access_for_public(self):
         handler = FileAssets.get_asset()
-        self.assertEqual("Uploaded", handler.put_file("test_folder/test2.txt"))
+        self.assertEqual(True, handler.put_file("test_folder/test2.txt"))
         test = handler.get_access("test_folder", short=True)
-        self.assertEqual("Deleted", handler.del_file("test_folder/test2.txt"))
+        self.assertEqual(True, handler.del_file("test_folder/test2.txt"))
         self.assertEqual(test, "http://localhost:9000/test/test_folder")
 
     def test_get_folder_size(self):
         handler = FileAssets.get_asset()
-        self.assertEqual("Uploaded", handler.put_file("test_folder/test2.txt"))
+        self.assertEqual(True, handler.put_file("test_folder/test2.txt"))
         self.assertEqual(19, handler.get_size("test_folder"))
-        self.assertEqual("Deleted", handler.del_file("test_folder/test2.txt"))
+        self.assertEqual(True, handler.del_file("test_folder/test2.txt"))
 
     def tearDown(self):
         handler = FileAssets.get_asset()
         handler.client.remove_bucket("test")
-        for file in glob.glob('results/*'):
-            if '.gitkeep' not in file:
+        for file in glob.glob("results/*"):
+            if ".gitkeep" not in file:
                 os.remove(file)
-        for file in glob.glob('results/remote/*'):
-            if '.gitkeep' not in file:
+        for file in glob.glob("results/remote/*"):
+            if ".gitkeep" not in file:
                 os.remove(file)

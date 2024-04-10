@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 class LocalFiles(FileAssets):
 
     def __init__(self):
-        self.location = os.getenv("ASSET_LOCATION", "")
-        self.server_url = os.getenv("ASSET_PUBLIC_URL", "error")
+        self.location = os.getenv("ASSET_LOCATION")
+        self.server_url = os.getenv("ASSET_PUBLIC_URL")
         super().__init__()
 
     def get_access(self, filename, seconds=0, short=True, download_filename=""):
@@ -24,11 +24,7 @@ class LocalFiles(FileAssets):
         for root, dirs, files in os.walk("{}{}".format(self.location, path)):
             for f in files:
                 self.get_file("{}/{}".format(root.replace(self.location, ""), f))
-        return "Donwloaded"
-
-    def get_size(self, folder):
-        size = 0
-        return size
+        return True
 
     def get_file(self, filename):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
@@ -41,11 +37,13 @@ class LocalFiles(FileAssets):
                 copyfile(asset_filename, local_filename)
             else:
                 logger.info("File already downloaded {}".format(local_filename))
-                return "Exists"
+                return True
         except Exception as e:
-            logger.exception("Download file from local store failed with error: {}".format(str(e)))
-            return "Failed"
-        return "Downloaded"
+            logger.exception(
+                "Download file from local store failed with error: {}".format(str(e))
+            )
+            return False
+        return True
 
     def put_file(self, filename):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
@@ -55,15 +53,20 @@ class LocalFiles(FileAssets):
             folder_path.mkdir(parents=True, exist_ok=True)
             copyfile(local_filename, asset_filename)
         except Exception as e:
-            logger.exception("Upload file to store failed with error: {}".format(str(e)))
-            return "Failed"
-        return "Uploaded"
+            logger.exception(
+                "Upload file to store failed with error: {}".format(str(e))
+            )
+            return False
+        return True
 
-    def del_file(self, filename, archive=False):
+    def del_file(self, filename):
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         if os.path.exists(asset_filename):
             try:
                 os.remove(asset_filename)
-                return "Deleted"
+                return True
             except Exception as e:
-                logger.exception("Delete file from local store failed with error: {}".format(str(e)))
+                logger.exception(
+                    "Delete file from local store failed with error: {}".format(str(e))
+                )
+        return False
