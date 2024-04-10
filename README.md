@@ -71,7 +71,7 @@ assets = FileAssets.get_asset()  # setup asset store
 assets.put_file("some_file.txt")  # Upload file from local download folder
 assets.get_file("some_file.txt")  # Download file to local download folder
 assets.del_local_file("some_file.txt")  # Delete file from local download folder
-assets.del_file("some_file.txt")  # Deletes file from serve
+assets.del_file("some_file.txt")  # Deletes file from server
 ```
 
 
