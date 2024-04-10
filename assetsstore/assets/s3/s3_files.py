@@ -44,6 +44,17 @@ class ProgressPercentage(object):
 
 
 class S3Files(FileAssets):
+    """
+    A class for interacting with files stored in an S3 bucket.
+
+    Attributes:
+        aws_access_key_id (str): The AWS access key ID.
+        aws_secret_access_key (str): The AWS secret access key.
+        s3_bucket_name (str): The name of the S3 bucket.
+        region_name (str): The AWS region name.
+        connection (boto3.client): The S3 client connection.
+        resource (boto3.resource): The S3 resource connection.
+    """
 
     def __init__(self):
         self.aws_access_key_id = os.getenv("ASSET_ACCESS_KEY")
@@ -64,7 +75,17 @@ class S3Files(FileAssets):
         self.resource = session.resource("s3")
         super().__init__()
 
-    def get_size(self, folder):
+    def get_size(self, folder: str):
+        """
+        Get the total size of files in a folder in the S3 bucket.
+
+        Args:
+            folder (str): The folder path in the S3 bucket.
+
+        Returns:
+            int: The total size of files in the folder.
+
+        """
         size = 0
         try:
             bucket = self.resource.Bucket(self.s3_bucket_name)
@@ -78,7 +99,26 @@ class S3Files(FileAssets):
             return False
         return size
 
-    def get_access(self, filename, seconds=0, short=False, download_filename=""):
+    def get_access(
+        self,
+        filename: str,
+        seconds: int = 0,
+        short: bool = False,
+        download_filename: str = "",
+    ):
+        """
+        Get temporary access to download a file from the S3 bucket.
+
+        Args:
+            filename (str): The name of the file in the S3 bucket.
+            seconds (int): The duration of access in seconds (default: 0).
+            short (bool): Whether to generate a short URL (default: False).
+            download_filename (str): The name of the file to be downloaded (default: "").
+
+        Returns:
+            str: The URL for accessing the file.
+
+        """
         response = None
         try:
             if not download_filename:
@@ -111,7 +151,18 @@ class S3Files(FileAssets):
             return False
         return response
 
-    def get_upload_access(self, filename, seconds=0):
+    def get_upload_access(self, filename: str, seconds: int = 0):
+        """
+        Get temporary access to upload a file to the S3 bucket.
+
+        Args:
+            filename (str): The name of the file in the S3 bucket.
+            seconds (int): The duration of access in seconds (default: 0).
+
+        Returns:
+            str: The URL for uploading the file.
+
+        """
         response = None
 
         # Set the desired multipart threshold value (5GB)
@@ -134,7 +185,17 @@ class S3Files(FileAssets):
             return False
         return response
 
-    def get_folder(self, path):
+    def get_folder(self, path: str):
+        """
+        Download a folder from the S3 bucket to the local file system.
+
+        Args:
+            path (str): The folder path in the S3 bucket.
+
+        Returns:
+            bool: True if the folder is downloaded successfully, False otherwise.
+
+        """
         try:
             local_folder = os.path.realpath("{}{}".format(self.local_store, path))
             logger.info(
@@ -154,18 +215,28 @@ class S3Files(FileAssets):
                     self.get_file(obj.key)
                 except Exception as e:
                     logger.warning(
-                        "Error occured downloading file {}, with error: {}".format(
+                        "Error occurred downloading file {}, with error: {}".format(
                             str(e), obj.key
                         )
                     )
         except Exception as e:
             logger.warning(
-                "Error occured while downloading folder from s3 {}".format(str(e))
+                "Error occurred while downloading folder from s3 {}".format(str(e))
             )
             return False
         return True
 
-    def del_folder(self, path):
+    def del_folder(self, path: str):
+        """
+        Delete a folder and its contents from the S3 bucket.
+
+        Args:
+            path (str): The folder path in the S3 bucket.
+
+        Returns:
+            bool: True if the folder is deleted successfully, False otherwise.
+
+        """
         bucket = self.resource.Bucket(self.s3_bucket_name)
         for obj in bucket.objects.filter(Prefix=path):
             try:
@@ -177,7 +248,17 @@ class S3Files(FileAssets):
                 return False
         return True
 
-    def get_file(self, filename):
+    def get_file(self, filename: str):
+        """
+        Download a file from the S3 bucket to the local file system.
+
+        Args:
+            filename (str): The name of the file in the S3 bucket.
+
+        Returns:
+            bool: True if the file is downloaded successfully, False otherwise.
+
+        """
         try:
             full_filename = os.path.realpath("{}{}".format(self.local_store, filename))
             my_file = Path(full_filename)
@@ -192,7 +273,7 @@ class S3Files(FileAssets):
                 )
             else:
                 logger.info("file already exists at path {}".format(full_filename))
-                return "Exists"
+                return True
 
         except Exception as e:
             logger.exception(
@@ -201,19 +282,40 @@ class S3Files(FileAssets):
             return False
         return True
 
-    def put_file(self, filename):
+    def put_file(self, filename: str):
+        """
+        Upload a file from the local file system to the S3 bucket.
+
+        Args:
+            filename (str): The name of the file in the S3 bucket.
+
+        Returns:
+            bool: True if the file is uploaded successfully, False otherwise.
+
+        """
         try:
             full_filename = os.path.realpath("{}{}".format(self.local_store, filename))
             progress = ProgressPercentage(full_filename)
             self.connection.upload_file(
                 full_filename, self.s3_bucket_name, filename, Callback=progress
             )
-            return "Uploaded"
         except Exception as e:
             logger.exception("Upload file to s3 failed with error: {}".format(str(e)))
             return False
+        return True
 
-    def del_file(self, filename, archive=False):
+    def del_file(self, filename: str, archive: bool = False):
+        """
+        Delete a file from the S3 bucket.
+
+        Args:
+            filename (str): The name of the file in the S3 bucket.
+            archive (bool): Whether to archive the file before deleting (default: False).
+
+        Returns:
+            bool: True if the file is deleted successfully, False otherwise.
+
+        """
         try:
             if archive:
                 self.connection.copy(

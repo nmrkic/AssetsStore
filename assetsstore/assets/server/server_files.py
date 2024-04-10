@@ -10,6 +10,21 @@ logger = logging.getLogger(__name__)
 
 
 class ServerFiles(FileAssets):
+    """
+    Represents a class for managing server files.
+
+    This class provides methods for accessing, uploading, downloading,
+    and deleting files on a remote server.
+
+    Attributes:
+        server (str): The server address.
+        username (str): The username for authentication.
+        location (str): The location of the asset files on the server.
+        server_url (str): The public URL of the asset server.
+        ssh (paramiko.SSHClient): The SSH client for connecting to the server.
+        pkey (paramiko.Ed25519Key): The private key for authentication (optional).
+        password (str): The password for authentication (optional).
+    """
 
     def __init__(self):
         self.server = os.getenv("ASSET_SERVER")
@@ -34,12 +49,39 @@ class ServerFiles(FileAssets):
         super().__init__()
 
     def get_access(self, filename, *args, **kwargs):
+        """
+        Get the access URL for a file.
+
+        Args:
+            filename (str): The name of the file.
+
+        Returns:
+            str: The access URL for the file.
+        """
         return "{}{}".format(self.server_url, filename)
 
     def get_upload_access(self, filename, *args, **kwargs):
+        """
+        Get the upload access URL for a file.
+
+        Args:
+            filename (str): The name of the file.
+
+        Returns:
+            str: The upload access URL for the file.
+        """
         return "{}{}".format(self.server_url, filename)
 
     def get_size(self, folder):
+        """
+        Get the size of a folder on the server.
+
+        Args:
+            folder (str): The path to the folder.
+
+        Returns:
+            int: The size of the folder in bytes.
+        """
         size = 0
         asset_folder = "{}{}".format(self.location, folder)
         sftp = self.ssh.open_sftp()
@@ -48,6 +90,16 @@ class ServerFiles(FileAssets):
         return size
 
     def listdir_r(self, sftp, remotedir):
+        """
+        Recursively list all files in a directory on the server.
+
+        Args:
+            sftp (paramiko.SFTPClient): The SFTP client.
+            remotedir (str): The path to the directory.
+
+        Returns:
+            list: A list of file paths.
+        """
         file_list = []
         for entry in sftp.listdir_attr(remotedir):
             remotepath = remotedir + "/" + entry.filename
@@ -59,6 +111,15 @@ class ServerFiles(FileAssets):
         return file_list
 
     def get_folder(self, path):
+        """
+        Download a folder from the server.
+
+        Args:
+            path (str): The path to the folder on the server.
+
+        Returns:
+            bool: True if the folder was downloaded successfully, False otherwise.
+        """
         try:
             sftp = self.ssh.open_sftp()
             asset_folder = "{}{}".format(self.location, path)
@@ -75,6 +136,15 @@ class ServerFiles(FileAssets):
         return True
 
     def get_file(self, filename):
+        """
+        Download a file from the server.
+
+        Args:
+            filename (str): The name of the file on the server.
+
+        Returns:
+            bool: True if the file was downloaded successfully, False otherwise.
+        """
         asset_filename = "{}{}".format(self.location, filename)
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
         try:
@@ -98,6 +168,15 @@ class ServerFiles(FileAssets):
         return True
 
     def put_file(self, filename):
+        """
+        Upload a file to the server.
+
+        Args:
+            filename (str): The name of the file to upload.
+
+        Returns:
+            bool: True if the file was uploaded successfully, False otherwise.
+        """
         asset_filename = "{}{}".format(self.location, filename)
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
         try:
@@ -116,7 +195,17 @@ class ServerFiles(FileAssets):
             return False
         return True
 
-    def del_file(self, filename, archive=False):
+    def del_file(self, filename, *args, **kwargs):
+        """
+        Delete a file from the server.
+
+        Args:
+            filename (str): The name of the file to delete.
+            archive (bool): Whether to archive the file (default: False).
+
+        Returns:
+            bool: True if the file was deleted successfully, False otherwise.
+        """
         asset_filename = "{}{}".format(self.location, filename)
         if os.path.exists(asset_filename):
             try:

@@ -21,7 +21,7 @@ s3 = ["boto3>=1.26.66"]
 azure = ["azure-storage-blob==2.1.0"]
 server = ["paramiko>=3.2.0"]
 minio = ["minio>=7.1.13"]
-tests = ["pytest", "mock", "requests", "pytest-runner", "pre-commit"]
+tests = ["pytest", "mock", "requests", "pytest-runner", "pre-commit", "pytest-mock"]
 
 [tool.setuptools]
 packages = ["assets"]

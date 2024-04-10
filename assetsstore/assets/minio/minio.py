@@ -11,6 +11,20 @@ logger = logging.getLogger(__name__)
 
 
 class MinioFiles(FileAssets):
+    """
+    A class for interacting with Minio file storage.
+
+    This class provides methods for managing files and folders in a Minio bucket.
+
+    Attributes:
+        access_key (str): The access key for the Minio server.
+        secret_key (str): The secret access key for the Minio server.
+        bucket_name (str): The name of the bucket in the Minio server.
+        host (str): The host URL of the Minio server.
+        tls_enabled (bool): Whether TLS encryption is enabled for the Minio server.
+        client (Minio): The Minio client object for interacting with the server.
+
+    """
 
     def __init__(self):
         self.access_key = os.getenv("ASSET_ACCESS_KEY")
@@ -23,7 +37,17 @@ class MinioFiles(FileAssets):
         )
         super().__init__()
 
-    def get_size(self, folder):
+    def get_size(self, folder: str):
+        """
+        Get the total size of a folder in the Minio bucket.
+
+        Args:
+            folder (str): The folder path in the Minio bucket.
+
+        Returns:
+            int: The total size of the folder in bytes.
+
+        """
         size = 0
         try:
             for obj in self.client.list_objects(
@@ -36,7 +60,19 @@ class MinioFiles(FileAssets):
             )
         return size
 
-    def get_access(self, filename, seconds: int = 0, short=False):
+    def get_access(self, filename: str, seconds: int = 0, short=False):
+        """
+        Get the access URL for a file in the Minio bucket.
+
+        Args:
+            filename (str): The name of the file in the Minio bucket.
+            seconds (int, optional): The number of seconds the access URL should be valid for. Defaults to 0.
+            short (bool, optional): Whether to generate a short URL using a URL shortening service. Defaults to False.
+
+        Returns:
+            str: The access URL for the file.
+
+        """
         response = None
         try:
             if short:
@@ -60,7 +96,18 @@ class MinioFiles(FileAssets):
             )
         return response
 
-    def get_upload_access(self, filename, seconds: int = 0):
+    def get_upload_access(self, filename: str, seconds: int = 0):
+        """
+        Get the access URL for uploading a file to the Minio bucket.
+
+        Args:
+            filename (str): The name of the file to be uploaded.
+            seconds (int, optional): The number of seconds the access URL should be valid for. Defaults to 0.
+
+        Returns:
+            str: The access URL for uploading the file.
+
+        """
         response = None
         try:
             response = self.client.presigned_put_object(
@@ -77,7 +124,17 @@ class MinioFiles(FileAssets):
             return False
         return response
 
-    def get_folder(self, path):
+    def get_folder(self, path: str):
+        """
+        Download a folder from the Minio bucket.
+
+        Args:
+            path (str): The folder path in the Minio bucket.
+
+        Returns:
+            bool: True if the folder is downloaded successfully, False otherwise.
+
+        """
         try:
             local_folder = os.path.realpath("{}{}".format(self.local_store, path))
             logger.info(
@@ -109,7 +166,17 @@ class MinioFiles(FileAssets):
             return False
         return True
 
-    def del_folder(self, path):
+    def del_folder(self, path: str):
+        """
+        Delete a folder from the Minio bucket.
+
+        Args:
+            path (str): The folder path in the Minio bucket.
+
+        Returns:
+            bool: True if the folder is deleted successfully, False otherwise.
+
+        """
         objects = self.client.list_objects(
             self.bucket_name, prefix=path, recursive=True
         )
@@ -122,7 +189,16 @@ class MinioFiles(FileAssets):
             return False
         return True
 
-    def get_file(self, filename):
+    def get_file(self, filename: str):
+        """
+        Download a file from the Minio bucket.
+
+        Args:
+            filename (str): The name of the file in the Minio bucket.
+
+        Returns:
+            bool: True if the file is downloaded successfully, False otherwise.
+        """
         try:
             full_filename = os.path.realpath("{}{}".format(self.local_store, filename))
             my_file = Path(full_filename)
@@ -134,15 +210,25 @@ class MinioFiles(FileAssets):
                 )
             else:
                 logger.info("file already exists at path {}".format(full_filename))
-                return True
         except Exception as e:
             logger.exception(
-                "Download file from s3 failed with error: {}".format(str(e))
+                "Error occurred while downloading file {}. Exception: {}".format(
+                    filename, str(e)
+                )
             )
             return False
         return True
 
-    def put_file(self, filename):
+    def put_file(self, filename: str):
+        """
+        Upload a file to the Minio bucket.
+
+        Args:
+            filename (str): The name of the file in the Minio bucket.
+
+        Returns:
+            bool: True if the file is uploaded successfully, False otherwise.
+        """
         try:
             full_filename = os.path.realpath("{}{}".format(self.local_store, filename))
             self.client.fput_object(
@@ -155,7 +241,16 @@ class MinioFiles(FileAssets):
             )
             return False
 
-    def del_file(self, filename):
+    def del_file(self, filename: str):
+        """
+        Delete a file from the Minio bucket.
+
+        Args:
+            filename (str): The name of the file in the Minio bucket.
+
+        Returns:
+            bool: True if the file is deleted successfully, False otherwise.
+        """
         try:
             self.client.remove_object(self.bucket_name, filename)
         except Exception as e:

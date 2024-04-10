@@ -8,25 +8,72 @@ logger = logging.getLogger(__name__)
 
 
 class LocalFiles(FileAssets):
+    """
+    A class that represents local file assets.
+
+    This class provides methods to interact with local files,
+    including getting access to files,
+    uploading files, downloading files, and deleting files.
+    """
 
     def __init__(self):
         self.location = os.getenv("ASSET_LOCATION")
         self.server_url = os.getenv("ASSET_PUBLIC_URL")
         super().__init__()
 
-    def get_access(self, filename, seconds=0, short=True, download_filename=""):
+    def get_access(self, filename: str, *args, **kwargs):
+        """
+        Get the access URL for a file.
+
+        Args:
+            filename (str): The name of the file.
+
+        Returns:
+            str: The access URL for the file.
+
+        """
         return "{}{}".format(self.server_url, filename)
 
-    def get_upload_access(self, filename, seconds):
+    def get_upload_access(self, filename: str, *args, **kwargs):
+        """
+        Get the upload access URL for a file.
+
+        Args:
+            filename (str): The name of the file.
+
+        Returns:
+            str: The upload access URL for the file.
+
+        """
         return "{}{}".format(self.server_url, filename)
 
-    def get_folder(self, path):
+    def get_folder(self, path: str):
+        """
+        Get the files in a folder.
+
+        Args:
+            path (str): The path of the folder.
+
+        Returns:
+            bool: True if the operation is successful, False otherwise.
+
+        """
         for root, dirs, files in os.walk("{}{}".format(self.location, path)):
             for f in files:
                 self.get_file("{}/{}".format(root.replace(self.location, ""), f))
         return True
 
     def get_file(self, filename):
+        """
+        Get a file from the asset store.
+
+        Args:
+            filename (str): The name of the file.
+
+        Returns:
+            bool: True if the file is successfully downloaded, False otherwise.
+
+        """
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
         try:
@@ -46,6 +93,16 @@ class LocalFiles(FileAssets):
         return True
 
     def put_file(self, filename):
+        """
+        Put a file into the asset store.
+
+        Args:
+            filename (str): The name of the file.
+
+        Returns:
+            bool: True if the file is successfully uploaded, False otherwise.
+
+        """
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         local_filename = os.path.realpath("{}{}".format(self.local_store, filename))
         try:
@@ -60,6 +117,16 @@ class LocalFiles(FileAssets):
         return True
 
     def del_file(self, filename):
+        """
+        Delete a file from the asset store.
+
+        Args:
+            filename (str): The name of the file.
+
+        Returns:
+            bool: True if the file is successfully deleted, False otherwise.
+
+        """
         asset_filename = os.path.realpath("{}{}".format(self.location, filename))
         if os.path.exists(asset_filename):
             try:

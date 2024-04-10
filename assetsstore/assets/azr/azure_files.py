@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class AzureFiles(FileAssets):
+    """
+    A class representing Azure Files in the Assets Store.
+    """
 
     def __init__(self):
         self.azure_storage_name = os.getenv("ASSET_ACCESS_KEY")
@@ -23,7 +26,19 @@ class AzureFiles(FileAssets):
         )
         super().__init__()
 
-    def get_access(self, filename, seconds=0, short=True, download_file=""):
+    def get_access(self, filename: str, seconds: int = 0, *args, **kwargs):
+        """
+        Get the access URL for a file in Azure.
+
+        Args:
+            filename (str): The name of the file.
+            seconds (int, optional): The number of seconds
+                the access URL will be valid for.
+                Defaults to 0, which means the URL will be valid for 12 hours.
+
+        Returns:
+            str: The access URL for the file.
+        """
         if not seconds:
             seconds = 60 * 60 * 12  # 12 hours
         sas_url = self.connection.generate_blob_shared_access_signature(
@@ -38,7 +53,16 @@ class AzureFiles(FileAssets):
 
         return response
 
-    def get_folder(self, path):
+    def get_folder(self, path: str):
+        """
+        Download a folder from Azure.
+
+        Args:
+            path (str): The path of the folder in Azure.
+
+        Returns:
+            bool: True if the folder was downloaded successfully, False otherwise.
+        """
         try:
             local_folder = os.path.realpath("{}{}".format(self.local_store, path))
             logger.info(
@@ -59,18 +83,27 @@ class AzureFiles(FileAssets):
                     self.get_file(obj)
                 except Exception as e:
                     logger.warning(
-                        "Error occured downloading file {}, with error: {}".format(
+                        "Error occurred downloading file {}, with error: {}".format(
                             str(e), obj
                         )
                     )
         except Exception as e:
             logger.warning(
-                "Error occured while downloading folder from azure {}".format(str(e))
+                "Error occurred while downloading folder from Azure {}".format(str(e))
             )
             return False
         return True
 
-    def get_file(self, filename):
+    def get_file(self, filename: str):
+        """
+        Download a file from Azure.
+
+        Args:
+            filename (str): The name of the file in Azure.
+
+        Returns:
+            bool: True if the file was downloaded successfully, False otherwise.
+        """
         try:
             full_filename = os.path.realpath("{}{}".format(self.local_store, filename))
             my_file = Path(full_filename)
@@ -86,12 +119,21 @@ class AzureFiles(FileAssets):
 
         except Exception as e:
             logger.exception(
-                "Download file from azure failed with error: {}".format(str(e))
+                "Download file from Azure failed with error: {}".format(str(e))
             )
             return False
         return True
 
-    def put_file(self, filename):
+    def put_file(self, filename: str):
+        """
+        Upload a file to Azure.
+
+        Args:
+            filename (str): The name of the file to upload.
+
+        Returns:
+            bool: True if the file was uploaded successfully, False otherwise.
+        """
         try:
             full_filename = os.path.realpath("{}{}".format(self.local_store, filename))
             self.connection.create_blob_from_path(
@@ -100,18 +142,27 @@ class AzureFiles(FileAssets):
             return True
         except Exception as e:
             logger.exception(
-                "Upload file to azure failed with error: {}".format(str(e))
+                "Upload file to Azure failed with error: {}".format(str(e))
             )
             return False
 
-    def del_file(self, filename, archive=False):
+    def del_file(self, filename: str, *args, **kwargs):
+        """
+        Delete a file from Azure.
+
+        Args:
+            filename (str): The name of the file to delete.
+
+        Returns:
+            bool: True if the file was deleted successfully, False otherwise.
+        """
         try:
             self.connection.delete_blob(
                 self.azure_storage_container, filename, snapshot=None
             )
         except Exception as e:
             logger.exception(
-                "Delete file from azure failed with error: {}".format(str(e))
+                "Delete file from Azure failed with error: {}".format(str(e))
             )
             return False
         return True
