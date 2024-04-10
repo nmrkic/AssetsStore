@@ -79,8 +79,10 @@ assets.del_file("some_file.txt")  # Deletes file from server
 
 ## Deployment to PyPI
 
+```bash
 flit build
 flit publish
+```
 
 ## Contributing
 
