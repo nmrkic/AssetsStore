@@ -1,4 +1,5 @@
 # Assets Store
+
 ### [**Github**](https://github.com/nmrkic/AssetsStore)
 
 This library was created to simplify the upload/download of files from/to S3, Azure Storage, or your desired server.
@@ -7,18 +8,16 @@ This library was created to simplify the upload/download of files from/to S3, Az
 
 The project is using python 3.12, it relies on boto3 lib for S3, azure-storage-blob for AzureStorage, and paramiko for server connections.
 
-
 - [Python 3.12](python.org/downloads/)
 - [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html)
 - [azure-storage-blob](https://pypi.org/project/azure-storage-blob/)
 - [paramiko](https://www.paramiko.org/)
 
-
 ## How to use
 
 Install with pip depending on which type of storage do you use (s3,server,azure,minio are choices):
 
-``` pip install AssetsStore[s3] ```
+`pip install AssetsStore[s3]`
 
 Set environment variables dependent on what upload you are using:
 
@@ -74,19 +73,15 @@ assets.del_local_file("some_file.txt")  # Delete file from local download folder
 assets.del_file("some_file.txt")  # Deletes file from server
 ```
 
-
 ## Authors
-
-  
 
 - [@nmrkic](https://github.com/nmrkic)
 
-  
-  
+## Deployment to PyPI
+
+flit build
+flit publish
 
 ## Contributing
 
-  
-
 Contributions are always welcome! :)
-
