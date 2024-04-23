@@ -6,7 +6,6 @@ import logging
 
 
 class AsssetsLocalTest(TestCase):
-
     def setUp(self):
         self.maxDiff = None
         logging.basicConfig(level=logging.INFO)
@@ -16,7 +15,7 @@ class AsssetsLocalTest(TestCase):
         with self.assertRaises(Exception) as context:
             FileAssets.get_asset()
         print(context.exception)
-        self.assertTrue("There is no asset" in str(context.exception))
+        self.assertTrue("Invalid ASSET_STORE value" in str(context.exception))
 
     def test_upload_and_download_from_local(self):
         # get set store

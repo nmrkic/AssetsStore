@@ -5,6 +5,7 @@ import zipfile
 import logging
 import requests
 import json
+from pydoc import locate
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,14 @@ class FileAssets(metaclass=abc.ABCMeta):
     The class also provides some common functionality for working with files,
     such as uploading, downloading, and deleting files.
     """
+
+    ASSETS_MAP = {
+        "S3Files": "assetsstore.assets.s3.s3_files.S3Files",
+        "AzureFiles": "assetsstore.assets.azr.azure_files.AzureFiles",
+        "LocalFiles": "assetsstore.assets.local.local_files.LocalFiles",
+        "ServerFiles": "assetsstore.assets.server.server_files.ServerFiles",
+        "MinioFiles": "assetsstore.assets.minio.minio.MinioFiles",
+    }
 
     def __init__(self):
         """
@@ -108,20 +117,17 @@ class FileAssets(metaclass=abc.ABCMeta):
         Class method that returns an instance of the appropriate
         subclass based on the value of the ASSET_STORE environment variable.
         """
-        asset = None
         selected = os.getenv("ASSET_STORE")
-        for sub_cls in cls.__subclasses__():
-            if selected.lower() == sub_cls.__name__.lower():
-                asset = sub_cls
-        if not asset:
+        if selected is None:
+            raise Exception("Environment variable ASSET_STORE is not set.")
+        if selected not in cls.ASSETS_MAP.keys():
             raise Exception(
-                """There is no asset by name '{}' please set environment variable
-                ASSET_STORE to one of the following:
-                LocalFiles, ServerFiles, S3Files, AzureFiles, MinioFiles""".format(
-                    selected
+                """Invalid ASSET_STORE value '{}'.
+                Please set it to one of the following: {}""".format(
+                    selected, ", ".join(cls.ASSETS_MAP.keys())
                 )
             )
-        return asset()
+        return locate(cls.ASSETS_MAP[selected])()
 
     def compress(self, file: str):
         """
