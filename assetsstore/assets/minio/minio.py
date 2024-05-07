@@ -26,14 +26,26 @@ class MinioFiles(FileAssets):
 
     """
 
-    def __init__(self):
-        self.access_key = os.getenv("ASSET_ACCESS_KEY")
-        self.secret_key = os.getenv("ASSET_SECRET_ACCESS_KEY")
-        self.bucket_name = os.getenv("ASSET_LOCATION")
-        self.host = os.getenv("ASSET_PUBLIC_URL", "localhost:9000")
-        self.tls_enabled = os.getenv("ASSET_TLS_ENABLED", False)
+    def __init__(
+        self,
+        access_key=os.getenv("ASSET_ACCESS_KEY"),
+        secret_key=os.getenv("ASSET_SECRET_ACCESS_KEY"),
+        bucket_name=os.getenv("ASSET_LOCATION"),
+        bucket_region=os.getenv("ASSET_REGION"),
+        host=os.getenv("ASSET_PUBLIC_URL", "localhost:9000"),
+        tls_enabled=os.getenv("ASSET_TLS_ENABLED", False),
+    ):
+        self.access_key = access_key
+        self.secret_key = secret_key
+        self.bucket_name = bucket_name
+        self.host = host
+        self.tls_enabled = tls_enabled
         self.client = Minio(
-            self.host, self.access_key, self.secret_key, secure=self.tls_enabled
+            self.host,
+            self.access_key,
+            self.secret_key,
+            secure=self.tls_enabled,
+            region=bucket_region,
         )
         super().__init__()
 
@@ -52,7 +64,7 @@ class MinioFiles(FileAssets):
             success = True
         except Exception as e:
             success = False
-            logger.warn("Cannot access bucket object. Exception {}".format(str(e)))
+            logger.warning("Cannot access bucket object. Exception {}".format(str(e)))
         if response:
             response.close()
             response.release_conn()

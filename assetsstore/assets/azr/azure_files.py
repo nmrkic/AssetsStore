@@ -14,11 +14,17 @@ class AzureFiles(FileAssets):
     A class representing Azure Files in the Assets Store.
     """
 
-    def __init__(self):
-        self.azure_storage_name = os.getenv("ASSET_ACCESS_KEY")
-        self.azure_storage_key = os.getenv("ASSET_SECRET_ACCESS_KEY")
-        self.azure_storage_container = os.getenv("ASSET_LOCATION")
-        self.azure_storage_url = os.getenv("ASSET_PUBLIC_URL")
+    def __init__(
+        self,
+        access_key=os.getenv("ASSET_ACCESS_KEY"),
+        secret_key=os.getenv("ASSET_SECRET_ACCESS_KEY"),
+        bucket_name=os.getenv("ASSET_LOCATION"),
+        host=os.getenv("ASSET_PUBLIC_URL"),
+    ):
+        self.azure_storage_name = access_key
+        self.azure_storage_key = secret_key
+        self.azure_storage_container = bucket_name
+        self.azure_storage_url = host
 
         self.connection = BlockBlobService(
             account_name=self.azure_storage_name,

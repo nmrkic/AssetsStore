@@ -26,11 +26,17 @@ class ServerFiles(FileAssets):
         password (str): The password for authentication (optional).
     """
 
-    def __init__(self):
-        self.server = os.getenv("ASSET_SERVER")
-        self.username = os.getenv("ASSET_ACCESS_KEY")
-        self.location = os.getenv("ASSET_LOCATION")
-        self.server_url = os.getenv("ASSET_PUBLIC_URL")
+    def __init__(
+        self,
+        server=os.getenv("ASSET_SERVER"),
+        username=os.getenv("ASSET_ACCESS_KEY"),
+        location=os.getenv("ASSET_LOCATION"),
+        server_url=os.getenv("ASSET_PUBLIC_URL"),
+    ):
+        self.server = server
+        self.username = username
+        self.location = location
+        self.server_url = server_url
         self.ssh = paramiko.SSHClient()
         self.ssh.load_host_keys(
             os.path.expanduser(os.path.join("~", ".ssh", "known_hosts"))
