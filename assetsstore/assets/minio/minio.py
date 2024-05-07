@@ -37,6 +37,27 @@ class MinioFiles(FileAssets):
         )
         super().__init__()
 
+    def check_if_exists(self, path: str):
+        """
+        Checks if desired object exists.
+        Args:
+            path (str): The path in the Minio bucket.
+
+        Returns:
+            bool: True if file exists, False otherwise.
+        """
+        response = None
+        try:
+            response = self.client.get_object(self.bucket_name, path)
+            success = True
+        except Exception as e:
+            success = False
+            logger.warn("Cannot access bucket object. Exception {}".format(str(e)))
+        if response:
+            response.close()
+            response.release_conn()
+        return success
+
     def get_size(self, folder: str):
         """
         Get the total size of a folder in the Minio bucket.
