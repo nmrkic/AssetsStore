@@ -26,6 +26,9 @@ class AzureFiles(FileAssets):
         )
         super().__init__()
 
+    def check_if_exists(self, path: str):
+        pass
+
     def get_access(self, filename: str, seconds: int = 0, *args, **kwargs):
         """
         Get the access URL for a file in Azure.

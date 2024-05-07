@@ -8,7 +8,6 @@ import requests
 
 
 class AsssetsLocalTest(TestCase):
-
     def setUp(self):
         os.environ["ASSET_STORE"] = "MinioFiles"
         os.environ["ASSET_ACCESS_KEY"] = "minio"
@@ -95,6 +94,13 @@ class AsssetsLocalTest(TestCase):
         handler = FileAssets.get_asset()
         self.assertEqual(True, handler.put_file("test_folder/test2.txt"))
         self.assertEqual(19, handler.get_size("test_folder"))
+        self.assertEqual(True, handler.del_file("test_folder/test2.txt"))
+
+    def test_check_if_file_exists(self):
+        handler = FileAssets.get_asset()
+        self.assertEqual(True, handler.put_file("test_folder/test2.txt"))
+        self.assertTrue(handler.check_if_exists("test_folder/test2.txt"))
+        self.assertFalse(handler.check_if_exists("test_folder/test33.txt"))
         self.assertEqual(True, handler.del_file("test_folder/test2.txt"))
 
     def tearDown(self):

@@ -75,6 +75,22 @@ class S3Files(FileAssets):
         self.resource = session.resource("s3")
         super().__init__()
 
+    def check_if_exists(self, path: str):
+        """
+        Checks if desired object exists.
+        Args:
+            path (str): The path in the S3 bucket.
+
+        Returns:
+            bool: True if file exists, False otherwise.
+        """
+        try:
+            self.connection.head_object(Bucket=self.s3_bucket_name, Key=path)
+            return True
+        except Exception as e:
+            logger.warn("Cannot access bucket object. Exception {}".format(str(e)))
+        return False
+
     def get_size(self, folder: str):
         """
         Get the total size of files in a folder in the S3 bucket.

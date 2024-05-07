@@ -48,6 +48,9 @@ class ServerFiles(FileAssets):
             )
         super().__init__()
 
+    def check_if_exists(self, path: str):
+        pass
+
     def get_access(self, filename, *args, **kwargs):
         """
         Get the access URL for a file.

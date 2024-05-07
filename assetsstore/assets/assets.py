@@ -60,6 +60,14 @@ class FileAssets(metaclass=abc.ABCMeta):
         """
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def check_if_exists(self, path: str):
+        """
+        Abstract method that needs to be implemented by subclasses.
+        Checks if desired object exists.
+        """
+        raise NotImplementedError
+
     def put_folder(self, path: str):
         """
         Uploads a folder to the asset store by

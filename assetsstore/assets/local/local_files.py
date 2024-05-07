@@ -21,6 +21,9 @@ class LocalFiles(FileAssets):
         self.server_url = os.getenv("ASSET_PUBLIC_URL")
         super().__init__()
 
+    def check_if_exists(self, path: str):
+        pass
+
     def get_access(self, filename: str, *args, **kwargs):
         """
         Get the access URL for a file.
