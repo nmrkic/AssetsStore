@@ -56,11 +56,17 @@ class S3Files(FileAssets):
         resource (boto3.resource): The S3 resource connection.
     """
 
-    def __init__(self):
-        self.aws_access_key_id = os.getenv("ASSET_ACCESS_KEY")
-        self.aws_secret_access_key = os.getenv("ASSET_SECRET_ACCESS_KEY")
-        self.s3_bucket_name = os.getenv("ASSET_LOCATION")
-        self.region_name = os.getenv("ASSET_REGION")
+    def __init__(
+        self,
+        access_key=os.getenv("ASSET_ACCESS_KEY"),
+        secret_key=os.getenv("ASSET_SECRET_ACCESS_KEY"),
+        bucket_name=os.getenv("ASSET_LOCATION"),
+        bucket_region=os.getenv("ASSET_REGION"),
+    ):
+        self.aws_access_key_id = access_key
+        self.aws_secret_access_key = secret_key
+        self.s3_bucket_name = bucket_name
+        self.region_name = bucket_region
         session = None
         if self.aws_access_key_id:
             session = boto3.Session(
@@ -88,7 +94,7 @@ class S3Files(FileAssets):
             self.connection.head_object(Bucket=self.s3_bucket_name, Key=path)
             return True
         except Exception as e:
-            logger.warn("Cannot access bucket object. Exception {}".format(str(e)))
+            logger.warning("Cannot access bucket object. Exception {}".format(str(e)))
         return False
 
     def get_size(self, folder: str):
