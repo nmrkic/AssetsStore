@@ -80,7 +80,9 @@ class S3Files(FileAssets):
             config=Config(region_name=self.region_name, signature_version="s3v4"),
             endpoint_url=f"https://s3.{self.region_name}.amazonaws.com",
         )
-        self.resource = session.resource("s3")
+        self.resource = session.resource(
+            "s3", endpoint_url=f"https://s3.{self.region_name}.amazonaws.com"
+        )
         super().__init__()
 
     def check_if_exists(self, path: str):
