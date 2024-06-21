@@ -76,7 +76,9 @@ class S3Files(FileAssets):
         else:
             session = boto3.Session()
         self.connection = session.client(
-            "s3", config=Config(region_name=self.region_name, signature_version="s3v4")
+            "s3",
+            config=Config(region_name=self.region_name, signature_version="s3v4"),
+            endpoint_url=f"https://s3.{self.region_name}.amazonaws.com",
         )
         self.resource = session.resource("s3")
         super().__init__()
