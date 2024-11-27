@@ -93,7 +93,13 @@ class MinioFiles(FileAssets):
             )
         return size
 
-    def get_access(self, filename: str, seconds: int = 0, short=False):
+    def get_access(
+        self,
+        filename: str,
+        seconds: int = 0,
+        short=False,
+        download_filename: str = "",
+    ):
         """
         Get the access URL for a file in the Minio bucket.
 
@@ -108,6 +114,8 @@ class MinioFiles(FileAssets):
         """
         response = None
         try:
+            if not download_filename:
+                download_filename = filename
             if short:
                 base_url = self.client._base_url._url
                 base_url = urlunsplit(base_url)
@@ -119,6 +127,9 @@ class MinioFiles(FileAssets):
                 response = self.client.presigned_get_object(
                     self.bucket_name,
                     filename,
+                    response_headers={
+                        "response-content-disposition": f"attachment;filename={download_filename}"
+                    },
                     expires=timedelta(seconds=seconds if seconds else 604800),
                 )
         except Exception as e:
