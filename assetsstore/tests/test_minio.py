@@ -88,7 +88,8 @@ class AsssetsLocalTest(TestCase):
             403, requests.get(f"http://{handler.host}/test/test.txt").status_code
         )
         handler.client.set_bucket_policy("test", json.dumps(policy))
-        url = handler.get_access("test.txt", short=False)
+        url = handler.get_access("test.txt", short=False, download_filename="novi.txt")
+        assert "novi.txt" in url
         self.assertEqual(200, requests.get(url).status_code)
         self.assertEqual(True, handler.del_file("test.txt"))
 
