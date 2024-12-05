@@ -20,17 +20,17 @@ class AzureFiles(FileAssets):
         secret_key=os.getenv("ASSET_SECRET_ACCESS_KEY"),
         bucket_name=os.getenv("ASSET_LOCATION"),
         host=os.getenv("ASSET_PUBLIC_URL"),
+        local_store=os.getenv("LOCAL_STORE"),
     ):
         self.azure_storage_name = access_key
         self.azure_storage_key = secret_key
         self.azure_storage_container = bucket_name
         self.azure_storage_url = host
-
+        self.local_store = local_store
         self.connection = BlockBlobService(
             account_name=self.azure_storage_name,
             account_key=self.azure_storage_key,
         )
-        super().__init__()
 
     def check_if_exists(self, path: str):
         pass
