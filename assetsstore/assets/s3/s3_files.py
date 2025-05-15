@@ -62,11 +62,13 @@ class S3Files(FileAssets):
         secret_key=os.getenv("ASSET_SECRET_ACCESS_KEY"),
         bucket_name=os.getenv("ASSET_LOCATION"),
         bucket_region=os.getenv("ASSET_REGION"),
+        local_store=os.getenv("LOCAL_STORE"),
     ):
         self.aws_access_key_id = access_key
         self.aws_secret_access_key = secret_key
         self.s3_bucket_name = bucket_name
         self.region_name = bucket_region
+        self.local_store = local_store
         session = None
         if self.aws_access_key_id:
             session = boto3.Session(
@@ -83,7 +85,6 @@ class S3Files(FileAssets):
         self.resource = session.resource(
             "s3", endpoint_url=f"https://s3.{self.region_name}.amazonaws.com"
         )
-        super().__init__()
 
     def check_if_exists(self, path: str):
         """
