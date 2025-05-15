@@ -16,10 +16,15 @@ class LocalFiles(FileAssets):
     uploading files, downloading files, and deleting files.
     """
 
-    def __init__(self):
-        self.location = os.getenv("ASSET_LOCATION")
-        self.server_url = os.getenv("ASSET_PUBLIC_URL")
+    def __init__(
+        self, location=os.getenv("ASSET_LOCATION"), server_url=os.getenv("SERVER_URL")
+    ):
+        self.location = location
+        self.server_url = server_url
         super().__init__()
+
+    def check_if_exists(self, path: str):
+        pass
 
     def get_access(self, filename: str, *args, **kwargs):
         """

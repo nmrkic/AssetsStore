@@ -60,6 +60,14 @@ class FileAssets(metaclass=abc.ABCMeta):
         """
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def check_if_exists(self, path: str):
+        """
+        Abstract method that needs to be implemented by subclasses.
+        Checks if desired object exists.
+        """
+        raise NotImplementedError
+
     def put_folder(self, path: str):
         """
         Uploads a folder to the asset store by
@@ -112,10 +120,12 @@ class FileAssets(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @classmethod
-    def get_asset(cls):
+    def get_asset(cls, **kwargs):
         """
         Class method that returns an instance of the appropriate
         subclass based on the value of the ASSET_STORE environment variable.
+        Use **kwargs to override environment variables related to the selected asset
+        eg. secret_key=my_key
         """
         selected = os.getenv("ASSET_STORE")
         if selected is None:
@@ -127,7 +137,7 @@ class FileAssets(metaclass=abc.ABCMeta):
                     selected, ", ".join(cls.ASSETS_MAP.keys())
                 )
             )
-        return locate(cls.ASSETS_MAP[selected])()
+        return locate(cls.ASSETS_MAP[selected])(**kwargs)
 
     def compress(self, file: str):
         """

@@ -26,16 +26,49 @@ class MinioFiles(FileAssets):
 
     """
 
-    def __init__(self):
-        self.access_key = os.getenv("ASSET_ACCESS_KEY")
-        self.secret_key = os.getenv("ASSET_SECRET_ACCESS_KEY")
-        self.bucket_name = os.getenv("ASSET_LOCATION")
-        self.host = os.getenv("ASSET_PUBLIC_URL", "localhost:9000")
-        self.tls_enabled = os.getenv("ASSET_TLS_ENABLED", False)
+    def __init__(
+        self,
+        access_key=os.getenv("ASSET_ACCESS_KEY"),
+        secret_key=os.getenv("ASSET_SECRET_ACCESS_KEY"),
+        bucket_name=os.getenv("ASSET_LOCATION"),
+        bucket_region=os.getenv("ASSET_REGION"),
+        host=os.getenv("ASSET_PUBLIC_URL", "localhost:9000"),
+        tls_enabled=os.getenv("ASSET_TLS_ENABLED", False),
+    ):
+        self.access_key = access_key
+        self.secret_key = secret_key
+        self.bucket_name = bucket_name
+        self.host = host
+        self.tls_enabled = tls_enabled
         self.client = Minio(
-            self.host, self.access_key, self.secret_key, secure=self.tls_enabled
+            self.host,
+            self.access_key,
+            self.secret_key,
+            secure=self.tls_enabled,
+            region=bucket_region,
         )
         super().__init__()
+
+    def check_if_exists(self, path: str):
+        """
+        Checks if desired object exists.
+        Args:
+            path (str): The path in the Minio bucket.
+
+        Returns:
+            bool: True if file exists, False otherwise.
+        """
+        response = None
+        try:
+            response = self.client.get_object(self.bucket_name, path)
+            success = True
+        except Exception as e:
+            success = False
+            logger.warning("Cannot access bucket object. Exception {}".format(str(e)))
+        if response:
+            response.close()
+            response.release_conn()
+        return success
 
     def get_size(self, folder: str):
         """
@@ -60,7 +93,13 @@ class MinioFiles(FileAssets):
             )
         return size
 
-    def get_access(self, filename: str, seconds: int = 0, short=False):
+    def get_access(
+        self,
+        filename: str,
+        seconds: int = 0,
+        short=False,
+        download_filename: str = "",
+    ):
         """
         Get the access URL for a file in the Minio bucket.
 
@@ -75,6 +114,8 @@ class MinioFiles(FileAssets):
         """
         response = None
         try:
+            if not download_filename:
+                download_filename = filename
             if short:
                 base_url = self.client._base_url._url
                 base_url = urlunsplit(base_url)
@@ -86,6 +127,9 @@ class MinioFiles(FileAssets):
                 response = self.client.presigned_get_object(
                     self.bucket_name,
                     filename,
+                    response_headers={
+                        "response-content-disposition": f"attachment;filename={download_filename}"
+                    },
                     expires=timedelta(seconds=seconds if seconds else 604800),
                 )
         except Exception as e:
