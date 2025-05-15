@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "AssetsStore"
-dependencies = ["requests>=2.28.2", "urllib3>=2.0.0"]
+dependencies = ["requests>=2.25.1", "urllib3>=2.0.0"]
 authors = [{ name = "Nebojsa Mrkic", email = "mrkic.nebojsa@gmail.com" }]
 readme = "README.md"
 license = { file = "LICENSE" }
