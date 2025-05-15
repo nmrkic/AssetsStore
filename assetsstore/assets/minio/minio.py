@@ -34,6 +34,7 @@ class MinioFiles(FileAssets):
         bucket_region=os.getenv("ASSET_REGION"),
         host=os.getenv("ASSET_PUBLIC_URL", "localhost:9000"),
         tls_enabled=os.getenv("ASSET_TLS_ENABLED", False),
+        local_store=os.getenv("LOCAL_STORE"),
     ):
         self.access_key = access_key
         self.secret_key = secret_key
@@ -47,7 +48,7 @@ class MinioFiles(FileAssets):
             secure=self.tls_enabled,
             region=bucket_region,
         )
-        super().__init__()
+        self.local_store = local_store
 
     def check_if_exists(self, path: str):
         """

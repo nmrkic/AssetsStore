@@ -32,11 +32,13 @@ class ServerFiles(FileAssets):
         username=os.getenv("ASSET_ACCESS_KEY"),
         location=os.getenv("ASSET_LOCATION"),
         server_url=os.getenv("ASSET_PUBLIC_URL"),
+        local_store=os.getenv("LOCAL_STORE"),
     ):
         self.server = server
         self.username = username
         self.location = location
         self.server_url = server_url
+        self.local_store = local_store
         self.ssh = paramiko.SSHClient()
         self.ssh.load_host_keys(
             os.path.expanduser(os.path.join("~", ".ssh", "known_hosts"))
@@ -52,7 +54,6 @@ class ServerFiles(FileAssets):
             self.ssh.connect(
                 self.server, username=self.username, password=self.password
             )
-        super().__init__()
 
     def check_if_exists(self, path: str):
         pass

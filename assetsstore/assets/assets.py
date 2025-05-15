@@ -27,15 +27,6 @@ class FileAssets(metaclass=abc.ABCMeta):
         "MinioFiles": "assetsstore.assets.minio.minio.MinioFiles",
     }
 
-    def __init__(self):
-        """
-        Initializes the `FileAssets` object and sets the
-        local store path based on the LOCAL_STORE environment variable.
-        This variable is important since our local store paths will act as
-        a medium between the asset store and the local file system.
-        """
-        self.local_store = os.getenv("LOCAL_STORE")
-
     @abc.abstractmethod
     def get_folder(self, path: str):
         """

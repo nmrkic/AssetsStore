@@ -17,11 +17,14 @@ class LocalFiles(FileAssets):
     """
 
     def __init__(
-        self, location=os.getenv("ASSET_LOCATION"), server_url=os.getenv("SERVER_URL")
+        self,
+        location=os.getenv("ASSET_LOCATION"),
+        server_url=os.getenv("SERVER_URL"),
+        local_store=os.getenv("LOCAL_STORE"),
     ):
         self.location = location
         self.server_url = server_url
-        super().__init__()
+        self.local_store = local_store
 
     def check_if_exists(self, path: str):
         pass
