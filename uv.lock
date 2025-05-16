@@ -37,7 +37,6 @@ wheels = [
 
 [[package]]
 name = "assetsstore"
-version = "1.7.1"
 source = { editable = "." }
 dependencies = [
     { name = "requests" },
@@ -79,9 +78,9 @@ requires-dist = [
     { name = "pytest-runner", marker = "extra == 'tests'" },
     { name = "requests", specifier = ">=2.25.1" },
     { name = "requests", marker = "extra == 'tests'" },
-    { name = "urllib3", specifier = ">=2.0.0" },
+    { name = "urllib3", specifier = ">=1.26.20" },
 ]
-provides-extras = ["s3", "azure", "server", "minio", "tests"]
+provides-extras = ["azure", "minio", "s3", "server", "tests"]
 
 [[package]]
 name = "azure-common"
