@@ -220,9 +220,9 @@ tests = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aioboto3", marker = "extra == 'async-s3'", specifier = ">=10.0.0" },
+    { name = "aioboto3", marker = "extra == 'async-s3'", specifier = ">=15.0.0" },
     { name = "azure-storage-blob", marker = "extra == 'azure'", specifier = "==2.1.0" },
-    { name = "boto3", marker = "extra == 's3'", specifier = ">=1.26.66" },
+    { name = "boto3", marker = "extra == 's3'", specifier = ">=1.38.0" },
     { name = "minio", marker = "extra == 'minio'", specifier = ">=7.1.13" },
     { name = "paramiko", marker = "extra == 'server'", specifier = ">=3.2.0" },
     { name = "pre-commit", marker = "extra == 'tests'" },
