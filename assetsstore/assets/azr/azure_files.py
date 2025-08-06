@@ -54,7 +54,7 @@ class AzureFiles(FileAssets):
             container_name=self.azure_storage_container,
             blob_name=filename,
             permission=BlobPermissions.READ,
-            expiry=dt.datetime.utcnow() + dt.timedelta(seconds=seconds),
+            expiry=dt.datetime.now(dt.timezone.utc) + dt.timedelta(seconds=seconds),
         )
         response = "{}/{}/{}?{}".format(
             self.azure_storage_url, self.azure_storage_container, filename, sas_url

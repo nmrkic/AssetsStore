@@ -1,52 +1,32 @@
-from unittest import TestCase
-from assetsstore.assets import FileAssets
-import glob
+import pytest
 import os
-import logging
+from assetsstore.assets import FileAssets
 
 
-class AsssetsLocalTest(TestCase):
-    def setUp(self):
-        self.maxDiff = None
-        logging.basicConfig(level=logging.INFO)
+def test_it_raises_error_if_asset_store_is_not_set():
+    with pytest.raises(Exception) as exc:
+        FileAssets.get_asset()
+    assert "Environment variable ASSET_STORE is not set." in str(exc.value)
 
-    def test_no_asset_store_set(self):
-        os.environ["ASSET_STORE"] = ""
-        with self.assertRaises(Exception) as context:
-            FileAssets.get_asset()
-        print(context.exception)
-        self.assertTrue("Invalid ASSET_STORE value" in str(context.exception))
 
-    def test_upload_and_download_from_local(self):
-        # get set store
-        os.environ["ASSET_STORE"] = "LocalFiles"
+def test_it_uploads_and_downloads_from_local():
+    os.environ["ASSET_STORE"] = "LocalFiles"
+    handler = FileAssets.get_asset(
+        location="assetsstore/tests/results/remote/",
+        local_store="assetsstore/tests/fixtures/",
+    )
+    assert handler.put_file("test.txt") is True
+    handler = FileAssets.get_asset(
+        location="assetsstore/tests/results/remote/",
+        local_store="assetsstore/tests/results/",
+    )
+    assert handler.get_file("test.txt") is True
 
-        os.environ["ASSET_ACCESS_KEY_ID"] = ""
-        os.environ["ASSET_SECRET_ACCESS_KEY"] = ""
-        os.environ["ASSET_LOCATION"] = "assetsstore/tests/results/remote/"
-        os.environ["ASSET_REGION"] = ""
+    # get again to check if it exists
+    assert handler.get_file("test.txt") is True
 
-        os.environ["LOCAL_STORE"] = "assetsstore/tests/fixtures/"
-        handler = FileAssets.get_asset()
-        self.assertEqual(True, handler.put_file("test.txt"))
+    # delete remote file
+    assert handler.del_file("test.txt") is True
 
-        os.environ["LOCAL_STORE"] = "assetsstore/tests/results/"
-        handler = FileAssets.get_asset()
-        self.assertEqual(True, handler.get_file("test.txt"))
-
-        # get again to check if it exists
-        self.assertEqual(True, handler.get_file("test.txt"))
-
-        # delete remote file
-        self.assertEqual(True, handler.del_file("test.txt"))
-
-        # delete local copy
-        self.assertEqual(True, handler.del_local_file("test.txt"))
-
-    def tearDown(self):
-        for file in glob.glob("results/*"):
-            if ".gitkeep" not in file:
-                os.remove(file)
-        for file in glob.glob("results/remote/*"):
-            if ".gitkeep" not in file:
-                os.remove(file)
+    # delete local file
+    assert handler.del_local_file("test.txt") is True
