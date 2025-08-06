@@ -12,18 +12,28 @@ logger = logging.getLogger(__name__)
 
 
 class ProgressPercentage:
-    """Thread-safe progress callback for S3 transfers."""
+    """Async-compatible thread-safe progress callback for S3 transfers.
+
+    Uses threading.Lock since callbacks are executed in background threads
+    by boto3's transfer manager, not in the main async event loop.
+    """
 
     def __init__(self, filename: str, size: float):
         self._filename = filename
         self._size = size if size else 1.0
         self._seen_so_far = 0
+        # Use threading.Lock because callbacks run in boto3's background threads
+        # This is safe because the callback doesn't await anything
         self._lock = threading.Lock()
 
     def __call__(self, bytes_amount):
+        # This method runs in boto3's background threads, not the async event loop
+        # So threading.Lock is appropriate here, not asyncio.Lock
         with self._lock:
             self._seen_so_far += bytes_amount
             percentage = round((self._seen_so_far / self._size) * 100, 2)
+
+            # Use thread-safe logging (logger is thread-safe)
             logger.info(
                 "%s → %s / %s  (%.2f%%)",
                 self._filename,
@@ -31,6 +41,7 @@ class ProgressPercentage:
                 self._size,
                 percentage,
             )
+            # sys.stdout.flush() is also thread-safe
             sys.stdout.flush()
 
 
@@ -44,6 +55,7 @@ class S3Files(FileAssets):
         bucket_name: str | None = os.getenv("ASSET_LOCATION"),
         bucket_region: str | None = os.getenv("ASSET_REGION"),
         local_store: str | None = os.getenv("LOCAL_STORE"),
+        endpoint_url: str | None = os.getenv("ASSET_ENDPOINT_URL"),
     ):
         self.aws_access_key_id = access_key
         self.aws_secret_access_key = secret_key
@@ -61,7 +73,9 @@ class S3Files(FileAssets):
             session_kwargs["region_name"] = self.region_name
 
         self._session = aioboto3.Session(**session_kwargs)
-        self._endpoint_url = f"https://s3.{self.region_name}.amazonaws.com"
+        self._endpoint_url = (
+            endpoint_url or f"https://s3.{self.region_name}.amazonaws.com"
+        )
 
     async def _client(self):
         """Context-manager helper to obtain an S3 client."""
