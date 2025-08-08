@@ -20,6 +20,7 @@ class FileAssets(metaclass=abc.ABCMeta):
     """
 
     ASSETS_MAP = {
+        "AsyncS3Files": "assetsstore.assets.s3.async_s3_files.AsyncS3Files",
         "S3Files": "assetsstore.assets.s3.s3_files.S3Files",
         "AzureFiles": "assetsstore.assets.azr.azure_files.AzureFiles",
         "LocalFiles": "assetsstore.assets.local.local_files.LocalFiles",

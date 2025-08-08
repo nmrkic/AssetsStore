@@ -3,7 +3,7 @@ from pathlib import Path
 import aioboto3
 import pytest
 
-from assetsstore.assets.s3.async_s3_files import S3Files
+from assetsstore.assets.s3 import AsyncS3Files
 
 
 MINIO_ENDPOINT = "http://localhost:9000"
@@ -33,7 +33,7 @@ async def ensure_minio_bucket():
 @pytest.fixture()
 async def s3files(tmp_path: Path):
     """Return S3Files instance configured for MinIO."""
-    fs = S3Files(
+    fs = AsyncS3Files(
         access_key=MINIO_ACCESS_KEY,
         secret_key=MINIO_SECRET_KEY,
         bucket_name=TEST_BUCKET,
@@ -44,7 +44,7 @@ async def s3files(tmp_path: Path):
     return fs
 
 
-async def test_put_get_del_file(s3files: S3Files, tmp_path: Path):
+async def test_put_get_del_file(s3files: AsyncS3Files, tmp_path: Path):
     """End-to-end upload, download and delete cycle against MinIO."""
 
     filename = "hello.txt"
@@ -69,19 +69,19 @@ async def test_put_get_del_file(s3files: S3Files, tmp_path: Path):
     assert await s3files.check_if_exists(filename) is False
 
 
-async def test_presigned_url(s3files: S3Files):
+async def test_presigned_url(s3files: AsyncS3Files):
     """Generate a presigned GET URL – should come back as an HTTP URL string."""
 
     url = await s3files.get_access("does_not_exist.txt", seconds=60, short=False)
     assert isinstance(url, str) and url.startswith("http")
 
 
-async def test_check_if_exists_missing(s3files: S3Files):
+async def test_check_if_exists_missing(s3files: AsyncS3Files):
     """Test existence check for non-existent file."""
     assert await s3files.check_if_exists("does_not_exist.txt") is False
 
 
-async def test_get_size_empty_folder(s3files: S3Files):
+async def test_get_size_empty_folder(s3files: AsyncS3Files):
     """Test get_size on empty folder."""
     size = await s3files.get_size("empty_folder/")
     assert size == 0
@@ -132,29 +132,29 @@ def test_progress_percentage_zero_size():
 async def test_s3files_init_variations():
     """Test S3Files initialization with different parameter combinations."""
     # Test with all None (should use environment variables)
-    fs1 = S3Files(None, None, None, None, None)
+    fs1 = AsyncS3Files(None, None, None, None, None)
     assert fs1.local_store == "./"
 
     # Test with custom local store
-    fs2 = S3Files(local_store="/custom/path/")
+    fs2 = AsyncS3Files(local_store="/custom/path/")
     assert fs2.local_store == "/custom/path/"
 
     # Test with minimal credentials
-    fs3 = S3Files("key", "secret", "bucket", "region")
+    fs3 = AsyncS3Files("key", "secret", "bucket", "region")
     assert fs3.aws_access_key_id == "key"
     assert fs3.aws_secret_access_key == "secret"
     assert fs3.s3_bucket_name == "bucket"
     assert fs3.region_name == "region"
 
 
-async def test_get_access_short_url(s3files: S3Files):
+async def test_get_access_short_url(s3files: AsyncS3Files):
     """Test get_access with short=True returns public S3 URL."""
     url = await s3files.get_access("test.txt", short=True)
     expected = f"https://{TEST_BUCKET}.s3.amazonaws.com/test.txt"
     assert url == expected
 
 
-async def test_get_access_with_download_filename(s3files: S3Files):
+async def test_get_access_with_download_filename(s3files: AsyncS3Files):
     """Test get_access with custom download filename."""
     url = await s3files.get_access(
         "test.txt", seconds=60, download_filename="custom.txt"
@@ -165,7 +165,7 @@ async def test_get_access_with_download_filename(s3files: S3Files):
     assert "custom.txt" in url
 
 
-async def test_get_upload_access(s3files: S3Files):
+async def test_get_upload_access(s3files: AsyncS3Files):
     """Test get_upload_access generates presigned PUT URL."""
     url = await s3files.get_upload_access("upload.txt", seconds=3600)
     assert isinstance(url, str)
@@ -174,7 +174,7 @@ async def test_get_upload_access(s3files: S3Files):
     assert "localhost:9000" in url
 
 
-async def test_get_size_with_files(s3files: S3Files, tmp_path: Path):
+async def test_get_size_with_files(s3files: AsyncS3Files, tmp_path: Path):
     """Test get_size with actual files in folder."""
     # Create and upload test files
     file1 = tmp_path / "folder" / "file1.txt"
@@ -196,7 +196,7 @@ async def test_get_size_with_files(s3files: S3Files, tmp_path: Path):
     await s3files.del_file("folder/file2.txt")
 
 
-async def test_get_file_already_exists(s3files: S3Files, tmp_path: Path):
+async def test_get_file_already_exists(s3files: AsyncS3Files, tmp_path: Path):
     """Test get_file when file already exists locally."""
     filename = "existing.txt"
     local_path = tmp_path / filename
@@ -215,7 +215,7 @@ async def test_get_file_already_exists(s3files: S3Files, tmp_path: Path):
     await s3files.del_file(filename)
 
 
-async def test_get_folder(s3files: S3Files, tmp_path: Path):
+async def test_get_folder(s3files: AsyncS3Files, tmp_path: Path):
     """Test downloading entire folder."""
     # Create folder structure
     folder_path = tmp_path / "test_folder"
@@ -245,7 +245,7 @@ async def test_get_folder(s3files: S3Files, tmp_path: Path):
     await s3files.del_folder("test_folder/")
 
 
-async def test_del_folder(s3files: S3Files, tmp_path: Path):
+async def test_del_folder(s3files: AsyncS3Files, tmp_path: Path):
     """Test deleting entire folder."""
     # Create and upload test folder
     folder_path = tmp_path / "delete_folder"
@@ -269,7 +269,7 @@ async def test_del_folder(s3files: S3Files, tmp_path: Path):
     assert await s3files.check_if_exists("delete_folder/file2.txt") is False
 
 
-async def test_del_file_archive(s3files: S3Files, tmp_path: Path):
+async def test_del_file_archive(s3files: AsyncS3Files, tmp_path: Path):
     """Test del_file with archive=True (Glacier storage)."""
     filename = "archive_test.txt"
     local_path = tmp_path / filename
@@ -292,7 +292,7 @@ async def test_del_file_archive(s3files: S3Files, tmp_path: Path):
 async def test_error_handling_invalid_bucket():
     """Test error handling with invalid bucket configuration."""
     # Create S3Files with invalid bucket
-    fs = S3Files(
+    fs = AsyncS3Files(
         access_key=MINIO_ACCESS_KEY,
         secret_key=MINIO_SECRET_KEY,
         bucket_name="nonexistent-bucket-12345",
@@ -321,7 +321,7 @@ async def test_error_handling_invalid_bucket():
 
 async def test_error_handling_invalid_credentials():
     """Test error handling with invalid credentials."""
-    fs = S3Files(
+    fs = AsyncS3Files(
         access_key="invalid",
         secret_key="invalid",
         bucket_name=TEST_BUCKET,
@@ -338,25 +338,25 @@ async def test_error_handling_invalid_credentials():
     assert isinstance(access_url, str) and access_url.startswith("http")
 
 
-async def test_put_file_missing_local(s3files: S3Files):
+async def test_put_file_missing_local(s3files: AsyncS3Files):
     """Test put_file with missing local file."""
     result = await s3files.put_file("nonexistent.txt")
     assert result is False
 
 
-async def test_get_file_missing_remote(s3files: S3Files):
+async def test_get_file_missing_remote(s3files: AsyncS3Files):
     """Test get_file with missing remote file."""
     result = await s3files.get_file("definitely_missing.txt")
     assert result is False
 
 
-async def test_get_folder_empty(s3files: S3Files):
+async def test_get_folder_empty(s3files: AsyncS3Files):
     """Test get_folder with empty/nonexistent folder."""
     result = await s3files.get_folder("empty_nonexistent_folder/")
     assert result is True  # Should succeed even if no files
 
 
-async def test_del_folder_empty(s3files: S3Files):
+async def test_del_folder_empty(s3files: AsyncS3Files):
     """Test del_folder with empty/nonexistent folder."""
     result = await s3files.del_folder("empty_nonexistent_folder/")
     assert result is True  # Should succeed even if no files
@@ -419,7 +419,7 @@ async def test_progress_percentage_thread_safety_with_async():
     assert end_time - start_time < 1.0  # Should be much faster than 1 second
 
 
-async def test_real_file_transfer_with_progress(s3files: S3Files, tmp_path: Path):
+async def test_real_file_transfer_with_progress(s3files: AsyncS3Files, tmp_path: Path):
     """Test actual file transfer with progress callbacks to ensure no async blocking."""
     import asyncio
 

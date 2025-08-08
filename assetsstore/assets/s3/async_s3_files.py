@@ -45,7 +45,7 @@ class ProgressPercentage:
             sys.stdout.flush()
 
 
-class S3Files(FileAssets):
+class AsyncS3Files(FileAssets):
     """Asynchronous S3 helper that mirrors the old FileAssets interface."""
 
     def __init__(
