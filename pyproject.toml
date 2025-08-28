@@ -46,3 +46,8 @@ exclude_lines = ["pragma: no cover"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 minversion = "6.0"
+
+[dependency-groups]
+dev = [
+    "flit>=3.12.0",
+]
