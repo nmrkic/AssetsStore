@@ -63,12 +63,14 @@ class S3Files(FileAssets):
         bucket_name=os.getenv("ASSET_LOCATION"),
         bucket_region=os.getenv("ASSET_REGION"),
         local_store=os.getenv("LOCAL_STORE"),
+        profile_name=os.getenv("AWS_PROFILE", "default"),
     ):
         self.aws_access_key_id = access_key
         self.aws_secret_access_key = secret_key
         self.s3_bucket_name = bucket_name
         self.region_name = bucket_region
         self.local_store = local_store
+        self.profile_name = profile_name
         session = None
         if self.aws_access_key_id:
             session = boto3.Session(
@@ -76,7 +78,7 @@ class S3Files(FileAssets):
                 aws_secret_access_key=self.aws_secret_access_key,
             )
         else:
-            session = boto3.Session()
+            session = boto3.Session(profile_name=self.profile_name)
         self.connection = session.client(
             "s3",
             config=Config(region_name=self.region_name, signature_version="s3v4"),
