@@ -63,7 +63,7 @@ class S3Files(FileAssets):
         bucket_name=os.getenv("ASSET_LOCATION"),
         bucket_region=os.getenv("ASSET_REGION"),
         local_store=os.getenv("LOCAL_STORE"),
-        profile_name=os.getenv("AWS_PROFILE", "default"),
+        profile_name=os.getenv("ASSETS_PROFILE", "default"),
     ):
         self.aws_access_key_id = access_key
         self.aws_secret_access_key = secret_key

@@ -56,19 +56,22 @@ class AsyncS3Files(FileAssets):
         bucket_region: str | None = os.getenv("ASSET_REGION"),
         local_store: str | None = os.getenv("LOCAL_STORE"),
         endpoint_url: str | None = os.getenv("ASSET_ENDPOINT_URL"),
+        profile_name=os.getenv("ASSET_PROFILE", "default"),
     ):
         self.aws_access_key_id = access_key
         self.aws_secret_access_key = secret_key
         self.s3_bucket_name = bucket_name
         self.region_name = bucket_region
         self.local_store = local_store or "./"
+        self.profile_name = profile_name
 
         # Build kwargs for aioboto3.Session, omit None to leverage default AWS
-        session_kwargs = {}
+        session_kwargs = {"profile_name": profile_name}
         if self.aws_access_key_id and self.aws_secret_access_key:
             session_kwargs["aws_access_key_id"] = self.aws_access_key_id
             session_kwargs["aws_secret_access_key"] = self.aws_secret_access_key
         # Allow region to be optional; if None, AWS SDK will infer from env/IMDS
+
         if self.region_name:
             session_kwargs["region_name"] = self.region_name
 
