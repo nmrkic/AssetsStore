@@ -56,7 +56,7 @@ class AsyncS3Files(FileAssets):
         bucket_region: str | None = os.getenv("ASSET_REGION"),
         local_store: str | None = os.getenv("LOCAL_STORE"),
         endpoint_url: str | None = os.getenv("ASSET_ENDPOINT_URL"),
-        profile_name=os.getenv("ASSET_PROFILE", "default"),
+        profile_name=os.getenv("ASSET_PROFILE", ""),
     ):
         self.aws_access_key_id = access_key
         self.aws_secret_access_key = secret_key
@@ -70,7 +70,7 @@ class AsyncS3Files(FileAssets):
         if self.aws_access_key_id and self.aws_secret_access_key:
             session_kwargs["aws_access_key_id"] = self.aws_access_key_id
             session_kwargs["aws_secret_access_key"] = self.aws_secret_access_key
-        else:
+        elif self.profile_name:
             session_kwargs["profile_name"] = self.profile_name
 
         # Allow region to be optional; if None, AWS SDK will infer from env/IMDS
